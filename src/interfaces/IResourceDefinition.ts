@@ -4,6 +4,9 @@ export interface IResourceDefinition {
     override?: string;
     whitelisted?: boolean;
     methods?: string[];
-    roles?: string[];
+    roles?: {
+        any?: string[];
+        all?: string[];
+    };
     ssoFlow: boolean;
 }

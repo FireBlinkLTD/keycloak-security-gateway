@@ -23,5 +23,7 @@
 !/.mocharc.yml
 !/.prettierignore
 !/.prettierrc.yml
+!/.gitignore
+!/Dockerfile
 
 

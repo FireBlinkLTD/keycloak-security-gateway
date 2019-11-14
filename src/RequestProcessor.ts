@@ -111,7 +111,13 @@ export class RequestProcessor {
             return false;       
         }
 
-        // TODO: verify roles
+        if (result.resource.roles) {
+            if (!jwt.verifyRoles(result.resource.roles)) {
+                await this.sendError(res, 403, 'Forbidden');
+                return false;
+            }
+        }
+        
         return true;
     }
 

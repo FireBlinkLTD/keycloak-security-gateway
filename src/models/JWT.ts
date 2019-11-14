@@ -1,3 +1,5 @@
+import { $log } from 'ts-log-debug';
+
 export class JWT {
     token: string;
     realm!: string;
@@ -33,6 +35,38 @@ export class JWT {
      */
     isExpired(): boolean {
         return this.content.exp * 1000 < Date.now();
+    }
+
+    /**
+     * Verify roles
+     * @param roles 
+     */
+    verifyRoles(roles: {
+        any?: string[],
+        all?: string[]
+    }): boolean {
+        if (roles.all) {
+            for (const role of roles.all) {
+                if (!this.hasRole(role)) {
+                    $log.debug(`Missing role in JWT: ${role}`);
+                    return false;
+                }
+            }
+        }
+
+        if (roles.any && roles.any.length) {
+            for (const role of roles.any) {
+                if (this.hasRole(role)) {
+                    $log.debug(`Found role in JWT: ${role}`);
+                    return true;
+                }
+            }
+
+            $log.debug(`No roles matching any in JWT were found.`);
+            return false;
+        }
+
+        return true;
     }
 
     /**

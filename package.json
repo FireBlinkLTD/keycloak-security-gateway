@@ -1,0 +1,88 @@
+{
+  "name": "@fireblink/keycloak-security-gateway",
+  "version": "0.1.0",
+  "description": "Node.js based proxy service to secure applications and integrate with Keycloak SSO flow.",
+  "keywords": [],
+  "engines": {
+    "node": ">=8.12.0"
+  },
+  "private": true,
+  "main": "dist/src/index.js",
+  "scripts": {
+    "commit": "npx git-cz",
+    "start": "node dist/src/",
+    "test": "rimraf ./coverage/ && nyc --reporter=html --reporter=text cross-env FBL_ENV=test mocha",
+    "build": "rimraf ./dist/ && tsc",
+    "lint": "tslint -c tslint.json src/**/*.ts test/**/*.ts index.ts",
+    "prettify": "prettier src/**/*.{md,ts,json} test/**/*.{md,ts,json} index.{md,ts,json} --write --config .prettierrc.yml && tslint 'src/**/*.ts' 'test/**/*.ts' 'index.ts' --fix",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "FireBlink LTD",
+  "license": "MIT",
+  "dependencies": {
+    "@types/config": "^0.0.36",
+    "@types/cookie": "^0.3.3",
+    "@types/http-proxy": "^1.17.1",
+    "@types/jsonwebtoken": "^8.3.5",
+    "axios": "^0.19.0",
+    "config": "^3.2.4",
+    "cookie": "^0.4.0",
+    "http-proxy": "^1.18.0",
+    "jsonwebtoken": "^8.5.1",
+    "ts-log-debug": "^5.1.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "8.2.0",
+    "@commitlint/config-conventional": "8.2.0",
+    "@types/chai": "4.2.4",
+    "@types/node": "12.12.7",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "commitizen": "4.0.3",
+    "conventional-changelog-cli": "2.0.27",
+    "cross-env": "6.0.3",
+    "cz-conventional-changelog": "3.0.2",
+    "husky": "3.0.9",
+    "jsonlint": "1.6.3",
+    "lint-staged": "9.4.2",
+    "mocha": "6.2.2",
+    "mocha-typescript": "1.1.17",
+    "mochawesome": "4.1.0",
+    "nyc": "14.1.1",
+    "prettier": "1.19.1",
+    "rimraf": "3.0.0",
+    "source-map-support": "0.5.16",
+    "ts-node": "8.5.0",
+    "tslint": "5.20.1",
+    "tslint-config-prettier": "1.18.0",
+    "typescript": "3.7.2"
+  },
+  "nyc": {
+    "cache": false,
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "src/**/index.ts",
+      "src/interfaces/*.ts",
+      "**/*.d.ts",
+      "coverage/**"
+    ],
+    "check-coverage": true,
+    "per-file": true,
+    "lines": 100,
+    "statements": 100,
+    "functions": 100,
+    "branches": 100,
+    "include": [
+      "src",
+      "dist/src"
+    ]
+  },
+  "contributors": [
+    {
+      "name": "Vladyslav Tkachenko",
+      "email": "vlad@fireblink.com"
+    }
+  ]
+}

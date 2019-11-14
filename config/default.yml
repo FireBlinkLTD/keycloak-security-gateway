@@ -1,0 +1,35 @@
+port: 3000
+host: http://127.0.0.1:3000
+
+log:
+  level: info
+
+keycloak:
+  clientId: <CLIENT_ID>
+  clientSecret: <CLIENT_SECRET>
+  realmURL: https://keycloak.example.com/auth/realms/<REALM_NAME>
+  # additional scopes to add to add to the default (openid+email+profile)
+  scopes: []    
+
+# the upstream endpoint which we should proxy request
+upstreamURL: http://127.0.0.1:80
+
+paths:
+  callback: /oauth/callback
+  logout: /logout 
+
+cookie:
+  secure: '1'
+  accessToken: kc-access-token
+  refreshToken: kc-refresh-token
+
+# a collection of resource i.e. urls that you wish to protect
+resources: []
+
+jwtVerification: OFFLINE # or ONLINE 
+
+  
+  
+  
+
+

@@ -1,0 +1,33 @@
+# the client id for the 'client' application
+port: APP_PORT
+host: APP_HOST
+
+log:
+  level: APP_LOG_LEVEL
+
+keycloak:
+  clientId: APP_KEYCLOAK_CLIENT_ID
+  clientSecret: APP_KEYCLOAK_CLIENT_SECRET
+  realmURL: APP_KEYCLOAK_REALM_URL
+
+  scopes: 
+    __name: APP_KEYCLOAK_SCOPES
+    __format: json
+
+upstreamURL: APP_UPSTREAM_URL
+
+paths:
+  callback: APP_PATHS_CALLBACK
+  logout: APP_PATHS_LOGOUT
+
+cookie:
+  secure: APP_COOKIE_SECURE
+  accessToken: APP_COOKIE_ACCESS_TOKEN
+  refreshToken: APP_COOKIE_REFRESH_TOKEN
+  
+jwtVerification: APP_JWT_VERIFICATION_MODE
+
+resources:
+  __name: APP_RESOURCES
+  __format: json  
+

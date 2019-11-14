@@ -1,7 +1,8 @@
 *
 
 !/config
-!/config/**
+!/config/default.yml
+!/config/custom-environment-variables.yml
 
 !/src
 !/src/**

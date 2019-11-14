@@ -25,5 +25,5 @@
 !/.prettierrc.yml
 !/.gitignore
 !/Dockerfile
-
+!/.dockerignore
 

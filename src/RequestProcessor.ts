@@ -85,7 +85,7 @@ export class RequestProcessor {
         await this.redirect(res, prepareLogoutURL());
     }
 
-    private async handleVerificationFlow(req: IncomingMessage, res: ServerResponse, path: string, result: ITargetPathResult): Promise<boolean> {
+    private async handleVerificationFlow(req: IncomingMessage, res: ServerResponse, path: string, result: ITargetPathResult): Promise<JWT | null> {
         let token = this.extractJWTToken(req);
         
         if (!token) {
@@ -96,7 +96,7 @@ export class RequestProcessor {
                 await this.sendError(res, 401, 'Unathorized');                    
             }
 
-            return false;
+            return null;
         }
 
         let jwt: JWT;
@@ -108,26 +108,34 @@ export class RequestProcessor {
 
         if (!jwt || jwt.isExpired()) {
             await this.sendError(res, 401, 'Unathorized');     
-            return false;       
+            
+            return null;       
         }
 
         if (result.resource.roles) {
             if (!jwt.verifyRoles(result.resource.roles)) {
                 await this.sendError(res, 403, 'Forbidden');
-                return false;
+                
+                return null;
             }
         }
         
-        return true;
+        return jwt;
     }
 
-    private async proxyRequest(req: IncomingMessage, res: ServerResponse, target: string) {
+    private async proxyRequest(req: IncomingMessage, res: ServerResponse, target: string, jwt: JWT) {
         $log.info('Proxy request to:', target);
 
         await new Promise((resolve, reject) => {
             this.proxy.web(req, res, { 
                 target,
-                ignorePath: true
+                ignorePath: true,
+                headers: {
+                    'X-Auth-Token': jwt.token,
+                    'X-Auth-Roles': jwt.getAllRoles().join(','),
+                    'X-Auth-Username': jwt.content.preferred_username,
+                    'X-Auth-Email': jwt.content.email,                              
+                }
             }, (err) => {
                 if (err) {
                     return reject(err);
@@ -159,9 +167,10 @@ export class RequestProcessor {
             return;
         }
         
+        let jwt;
         if (!result.resource.whitelisted) {
-            const exit = await this.handleVerificationFlow(req, res, path, result);
-            if (!exit) {
+            jwt = await this.handleVerificationFlow(req, res, path, result);
+            if (!jwt) {
                 return;
             }
         }
@@ -173,7 +182,7 @@ export class RequestProcessor {
             target += queryString;
         }
 
-        await this.proxyRequest(req, res, target);        
+        await this.proxyRequest(req, res, target, jwt);        
     }
     
     /**

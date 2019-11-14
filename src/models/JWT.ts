@@ -70,6 +70,29 @@ export class JWT {
     }
 
     /**
+     * Get all roles
+     */
+    getAllRoles(): string[] {
+        const result: string[] = [];
+
+        if (this.content.resource_access) {
+            for (const clientId of Object.keys(this.content.resource_access)) {
+                if (this.content.resource_access[clientId].roles) {
+                    for (const role of this.content.resource_access[clientId].roles) {
+                        result.push(clientId + ':' + role);
+                    }
+                }
+            }
+        }
+
+        if (this.content.realm_access && this.content.realm_access.roles) {
+            result.push(...this.content.realm_access.roles);
+        }
+
+        return result;
+    }
+
+    /**
      * Check if role exists
      * Examples:
      *  - realm_role
@@ -106,7 +129,7 @@ export class JWT {
      * @param {string} roleName
      * @return {boolean}
      */
-    private  hasRealmRole(roleName: string): boolean {
+    private hasRealmRole(roleName: string): boolean {
         if (!this.content.realm_access || !this.content.realm_access.roles) {
             return false;
         }

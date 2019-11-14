@@ -1,0 +1,9 @@
+*
+
+!/src
+!/config/default.yml
+!/config/custom-environment-variables.yml
+
+!/package.json
+!/yarn.lock
+!/tsconfig.json

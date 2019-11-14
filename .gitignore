@@ -9,7 +9,7 @@
 
 !/package.json
 !/README.md
-!/LICENCE
+!/LICENSE
 !/tsconfig.json
 !/tslint.json
 !/yarn.lock

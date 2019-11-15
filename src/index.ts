@@ -11,7 +11,9 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     requestProcessor.process(req, res);
 });
 
-const port = get('port');
-server.listen(port);
+const port:number = get('port');
+const hostInterface: string = get('interface');
+server.listen(port, hostInterface);
 
-$log.info('Listening new requests on port', port);
+$log.info(`Listening new requests on ${hostInterface}:${port}`);
+

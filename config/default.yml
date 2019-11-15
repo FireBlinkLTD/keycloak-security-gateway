@@ -1,4 +1,5 @@
 port: 3000
+interface: 127.0.0.1
 host: http://127.0.0.1:3000
 
 log:
@@ -18,7 +19,7 @@ paths:
   callback: /oauth/callback
   logout: /logout 
   health: /healthz
-  
+
 cookie:
   secure: '1'
   accessToken: kc-access-token

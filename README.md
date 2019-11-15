@@ -7,6 +7,7 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 ### Environment variables
 
 - `APP_PORT` - Application port
+- `APP_INTERFACE` - Interface to listen incomming connections, e.g. `0.0.0.0` to accept all, `127.0.0.1` to accept localhost only
 - `APP_HOST` - Ingress host name associated with service
 - `APP_LOG_LEVEL` - Log level, `debug`, `info`, `error`
 

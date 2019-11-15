@@ -1,5 +1,6 @@
 # the client id for the 'client' application
 port: APP_PORT
+interface: APP_INTERFACE
 host: APP_HOST
 
 log:

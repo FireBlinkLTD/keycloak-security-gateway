@@ -17,7 +17,8 @@ upstreamURL: http://127.0.0.1:80
 paths:
   callback: /oauth/callback
   logout: /logout 
-
+  health: /healthz
+  
 cookie:
   secure: '1'
   accessToken: kc-access-token

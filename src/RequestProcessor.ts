@@ -12,6 +12,7 @@ export class RequestProcessor {
     private upstreamURL: string = get('upstreamURL');
     private callbackPath: string = get('paths.callback');
     private logoutPath: string = get('paths.logout');
+    private healthPath: string = get('paths.health');
     private cookieAccessToken: string = get('cookie.accessToken');
     private secureCookies: boolean = get('cookie.secure') === '1';
     private cookieRefreshToken: string = get('cookie.refreshToken');
@@ -83,6 +84,25 @@ export class RequestProcessor {
     private async handleLogout(req: IncomingMessage, res: ServerResponse) {
         $log.debug('Handling logout request');
         await this.redirect(res, prepareLogoutURL());
+    }
+
+    private async handleHealth(res: ServerResponse) {
+        res.statusCode = 200;
+
+        await new Promise((resolve, reject) => {
+            res.write(JSON.stringify({
+                ready: true
+            }), (err) => {
+                if (err) {
+                    $log.warn('Unable to write response', err);
+                    return reject(err);
+                }
+
+                res.end(() => {
+                    resolve();
+                });
+            });
+        }); 
     }
 
     private async handleVerificationFlow(req: IncomingMessage, res: ServerResponse, path: string, result: ITargetPathResult): Promise<JWT | null> {
@@ -157,6 +177,11 @@ export class RequestProcessor {
 
         if (path === this.logoutPath) {
             await this.handleLogout(req, res);
+            return;
+        }
+
+        if (path === this.healthPath) {
+            await this.handleHealth(res);
             return;
         }
 

@@ -19,6 +19,7 @@ upstreamURL: APP_UPSTREAM_URL
 paths:
   callback: APP_PATHS_CALLBACK
   logout: APP_PATHS_LOGOUT
+  health: APP_PATHS_HEALTH
 
 cookie:
   secure: APP_COOKIE_SECURE

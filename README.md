@@ -19,6 +19,7 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 
 - `APP_PATHS_CALLBACK` - Routing path to use for SSO authentication callback, e.g. `/oauth/callback`
 - `APP_PATHS_LOGOUT` - Logout path to use, e.g. `/logout`
+- `APP_PATHS_HEALTH` - Gateway health endpoint, e.g. `/healthz`
 
 - `APP_COOKIE_SECURE` - Either cookies should be used only with HTTPS connection
 - `APP_COOKIE_ACCESS_TOKEN` - Access Token cookie name

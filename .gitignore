@@ -7,6 +7,12 @@
 !/src
 !/src/**
 
+!/test
+!/test/**
+
+!/.circleci
+!/.circleci/**
+
 !/package.json
 !/README.md
 !/LICENSE
@@ -24,6 +30,8 @@
 !/.prettierignore
 !/.prettierrc.yml
 !/.gitignore
-!/Dockerfile
+!/Dockerfile*
 !/.dockerignore
+!/docker-compose.yml
+!/test.sh
 

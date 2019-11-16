@@ -10,7 +10,7 @@ export class JWT {
     signed!: string;
 
     constructor(token: string) {
-        this.token = token;        
+        this.token = token;
 
         try {
             const parts = token.split('.');
@@ -39,16 +39,14 @@ export class JWT {
 
     /**
      * Verify roles
-     * @param roles 
+     * @param roles
      */
-    verifyRoles(roles: {
-        any?: string[],
-        all?: string[]
-    }): boolean {
+    verifyRoles(roles: { any?: string[]; all?: string[] }): boolean {
         if (roles.all) {
             for (const role of roles.all) {
                 if (!this.hasRole(role)) {
                     $log.debug(`Missing role in JWT: ${role}`);
+
                     return false;
                 }
             }
@@ -58,11 +56,13 @@ export class JWT {
             for (const role of roles.any) {
                 if (this.hasRole(role)) {
                     $log.debug(`Found role in JWT: ${role}`);
+
                     return true;
                 }
             }
 
             $log.debug(`No roles matching any in JWT were found.`);
+
             return false;
         }
 
@@ -103,11 +103,12 @@ export class JWT {
      */
     hasRole(roleName: string): boolean {
         if (roleName.indexOf(':') < 1) {
-            return this.hasRealmRole(roleName);            
+            return this.hasRealmRole(roleName);
         } else {
-            const parts = roleName.split(':')
+            const parts = roleName.split(':');
+
             return this.hasApplicationRole(parts[0], roleName.substring(parts[0].length + 1));
-        }        
+        }
     }
 
     /**

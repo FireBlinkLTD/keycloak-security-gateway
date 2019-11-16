@@ -9,7 +9,9 @@ log:
 keycloak:
   clientId: APP_KEYCLOAK_CLIENT_ID
   clientSecret: APP_KEYCLOAK_CLIENT_SECRET
-  realmURL: APP_KEYCLOAK_REALM_URL
+  realmURL: 
+    public: APP_KEYCLOAK_PUBLIC_REALM_URL
+    private: APP_KEYCLOAK_PRIVATE_REALM_URL
 
   scopes: 
     __name: APP_KEYCLOAK_SCOPES

@@ -14,31 +14,29 @@ const getPublicKey = (key: any): string => {
         (pubkey.match(/.{1,64}/g) || []).join('\n') +
         '\n-----END RSA PUBLIC KEY-----\n'
     );
-}
+};
 
 const convertToHex = (str: string): string => {
     const hex = Buffer.from(str, 'base64').toString('hex');
 
     return hex[0] < '0' || hex[0] > '7' ? `00${hex}` : hex;
-}
+};
 
 const toHex = (n: number): string => {
     const str = n.toString(16);
 
     return str.length % 2 ? `0${str}` : str;
-}
+};
 
 const toLongHex = (n: number): string => {
     const str = toHex(n);
     const lengthByteLength = 128 + str.length / 2;
 
     return toHex(lengthByteLength) + str;
-}
+};
 
 const encodeLength = (n: number) => {
     return n <= 127 ? toHex(n) : toLongHex(n);
-}
+};
 
-export {
-    getPublicKey,
-}
+export { getPublicKey };

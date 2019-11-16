@@ -1,0 +1,17 @@
+pipeline:
+  '--':
+    # create user
+    - 'keycloak.user.create':
+        credentials: $ref:secrets.credentials
+        realmName: $ref:ctx.realmName
+        user:
+          username: test
+          enabled: true
+          
+          credentials:
+            - type: password
+              value: test
+
+          email: john@localhost
+          firstName: John
+          lastName: Doe

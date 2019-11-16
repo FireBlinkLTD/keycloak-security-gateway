@@ -1,4 +1,4 @@
-import { IResourceDefinition } from "./IResourceDefinition";
+import { IResourceDefinition } from './IResourceDefinition';
 
 export interface ITargetPathResult {
     path: string;

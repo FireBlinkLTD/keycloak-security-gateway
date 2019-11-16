@@ -7,3 +7,7 @@
 !package.json
 !yarn.lock
 !tsconfig.json
+
+!test.sh
+!test
+!.mocharc.yml

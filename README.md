@@ -13,9 +13,10 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 
 - `APP_KEYCLOAK_CLIENT_ID` - Keycloak's client clientId
 - `APP_KEYCLOAK_CLIENT_SECRET` - Keycloak's client secret
-- `APP_KEYCLOAK_REALM_URL` - Keycloak's realm URL, e.g: `https://keycloak.example.com/auth/realms/master`
+- `APP_KEYCLOAK_PUBLIC_REALM_URL` - Keycloak's realm URL (public facing, used for SSO redirects), e.g: `https://keycloak.example.com/auth/realms/master`
+- `APP_KEYCLOAK_PRIVATE_REALM_URL` - Keycloak's realm URL (local DNS, used for API integration), e.g: `http://keycloak.default.svc.cluster.local:8080/auth/realms/master`
 - `APP_KEYCLOAK_SCOPES` - Additional client scopes in JSON string, e.g. `["openvpn","other"]`
-  
+
 - `APP_UPSTREAM_URL` - Upstream url to forward requests to
 
 - `APP_PATHS_CALLBACK` - Routing path to use for SSO authentication callback, e.g. `/oauth/callback`
@@ -25,7 +26,7 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 - `APP_COOKIE_SECURE` - Either cookies should be used only with HTTPS connection
 - `APP_COOKIE_ACCESS_TOKEN` - Access Token cookie name
 - `APP_COOKIE_REFRESH_TOKEN` - Refresh Token cookie name
-  
+
 - `APP_JWT_VERIFICATION_MODE` - JWT verification mode, either `ONLINE` or `OFFLINE`
 - `APP_RESOURCES` - JSON formatted configuration for resource matching
 
@@ -46,7 +47,7 @@ methods:
   - POST
 
 # [optional] override path before making a proxy call to upstream server
-override: /b/$1 
+override: /b/$1
 
 # [optional] roles to verify the JWT with
 roles:
@@ -72,5 +73,3 @@ Most common scenario to use. Fast, but if session get revoked on Keycloak side u
 ### Online validation
 
 Slow, as every request will be verified with Keycloak, however guarantees that if session get revoked - user will not have access to application any longer.
-
-

@@ -1,0 +1,5 @@
+pipeline:
+  '--':
+    - '@': realm.yml
+    - '@': client.yml
+    - '@': user.yml

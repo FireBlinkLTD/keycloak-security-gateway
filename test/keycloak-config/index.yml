@@ -1,0 +1,43 @@
+requires:
+  plugins:
+    '@fbl-plugins/keycloak-admin-client': '>=1.4.0'
+
+pipeline:
+  '--':
+    - ctx:
+        '$.realmName': 
+          inline: local
+    
+    - secrets:
+        '$.credentials':
+            inline:
+              realmName: master
+              baseUrl: http://keycloak:8080/auth
+              grantType: password
+              clientId: admin-cli
+              username: admin
+              password: admin
+
+    # Delete realm
+    # - keycloak.realm.delete:
+    #     credentials: $ref:secrets.credentials
+    #     realmName: $ref:ctx.realmName
+
+    # try to get a realm, if not exists - bootstrap it
+    - try:
+        action: 
+          'keycloak.realm.get':
+            credentials: $ref:secrets.credentials
+            realmName: $ref:ctx.realmName
+            
+        errorCode: 
+          assignTo: $.ctx.errorCode
+        catch:    
+          if: 
+            value: $ref:ctx.errorCode
+            is: 
+              '404': 
+                '@': 'bootstrap.yml'
+                              
+            else:
+              error: 'Unexpected error occurred.'    

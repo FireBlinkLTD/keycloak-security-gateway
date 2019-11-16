@@ -8,7 +8,9 @@ log:
 keycloak:
   clientId: <CLIENT_ID>
   clientSecret: <CLIENT_SECRET>
-  realmURL: https://keycloak.example.com/auth/realms/<REALM_NAME>
+  realmURL: 
+    public: https://keycloak.example.com/auth/realms/<REALM_NAME>
+    private: https://keycloak.example.com/auth/realms/<REALM_NAME>
   # additional scopes to add to add to the default (openid+email+profile)
   scopes: []    
 

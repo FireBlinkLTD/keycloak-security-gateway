@@ -1,0 +1,90 @@
+pipeline:
+  '--':
+    # create client
+    - 'keycloak.client.create':
+        credentials: $ref:secrets.credentials
+        realmName: $ref:ctx.realmName
+        client:      
+          clientId: test
+          enabled: true
+          publicClient: true
+          standardFlowEnabled: true
+          serviceAccountsEnabled: true
+          directAccessGrantsEnabled: true
+          authorizationServicesEnabled: true
+          fullScopeAllowed: false
+          
+          protocol: openid-connect
+          secret: 9067b642-015a-441a-816b-0c8d19305d10
+      
+          redirectUris:
+              - http://localhost:8888/*
+              - http://127.0.0.1:8888/*
+          
+          webOrigins:
+            - '+'          
+          
+          protocolMappers:
+            - name: Client Host
+              protocol: openid-connect
+              protocolMapper: oidc-usersessionmodel-note-mapper
+              consentRequired: false
+              config:
+                user.session.note: clientHost
+                id.token.claim: 'true'
+                access.token.claim: 'true'
+                claim.name: clientHost
+                jsonType.label: String
+              
+            - name: Client ID
+              protocol: openid-connect
+              protocolMapper: oidc-usersessionmodel-note-mapper
+              consentRequired: false
+              config:
+                user.session.note: clientId
+                id.token.claim: 'true'
+                access.token.claim: 'true'
+                claim.name: clientId
+                jsonType.label: String
+              
+            - name: realm roles
+              protocol: openid-connect
+              protocolMapper: oidc-usermodel-realm-role-mapper
+              consentRequired: false
+              config:
+                user.attribute: foo
+                access.token.claim: 'true'
+                claim.name: realm_access.roles
+                jsonType.label: String
+                multivalued: 'true'
+            
+            - name: client roles
+              protocol: openid-connect
+              protocolMapper: oidc-usermodel-client-role-mapper
+              consentRequired: false
+              config:
+                user.attribute: foo
+                access.token.claim: 'true'
+                claim.name: resource_access.${client_id}.roles
+                jsonType.label: String
+                multivalued: 'true'
+                                  
+            - name: Client IP Address
+              protocol: openid-connect
+              protocolMapper: oidc-usersessionmodel-note-mapper
+              consentRequired: false
+              config:
+                user.session.note: clientAddress
+                id.token.claim: 'true'
+                access.token.claim: 'true'
+                claim.name: clientAddress
+                jsonType.label: String
+
+    # create client role
+    - 'keycloak.client.role.create':
+        credentials: $ref:secrets.credentials
+        realmName: $ref:ctx.realmName
+        clientId: test
+        role:
+          name: test
+               

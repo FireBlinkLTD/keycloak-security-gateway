@@ -1,0 +1,6 @@
+pipeline:
+  'keycloak.realm.create':
+      credentials: $ref:secrets.credentials
+      realm: 
+        realm: $ref:ctx.realmName
+        enabled: true

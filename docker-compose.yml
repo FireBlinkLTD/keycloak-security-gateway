@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  app:
+    build: 
+      context: ./
+      dockerfile: Dockerfile-test
+    environment:
+      NODE_ENV: test
+      APP_PORT: 8888
+      APP_INTERFACE: 0.0.0.0
+      APP_HOST: http://localhost:8888
+      APP_LOG_LEVEL: debug
+      APP_KEYCLOAK_CLIENT_ID: test
+      APP_KEYCLOAK_CLIENT_SECRET: 9067b642-015a-441a-816b-0c8d19305d10
+      APP_KEYCLOAK_PUBLIC_REALM_URL: http://keycloak:8080/auth/realms/local
+      APP_KEYCLOAK_PRIVATE_REALM_URL: http://keycloak:8080/auth/realms/local
+      APP_KEYCLOAK_SCOPES: "[]"
+      APP_UPSTREAM_URL: "http://localhost:7777"
+      APP_PATHS_CALLBACK: /oauth/callback
+      APP_PATHS_LOGOUT: /logout
+      APP_PATHS_HEALTH: /healthz
+      APP_COOKIE_SECURE: '0'
+      APP_COOKIE_ACCESS_TOKEN: ACCESS_TOKEN
+      APP_COOKIE_REFRESH_TOKEN: REFRESH_TOKEN
+      APP_JWT_VERIFICATION_MODE: OFFLINE
+      APP_RESOURCES: '[{"match":"/sso/.*","ssoFlow":true},{"match":"/.*"}]'
+    ports:
+      - 8888:8888
+    volumes:
+      - './coverage:/app/coverage'
+      - './mochawesome-report:/app/mochawesome-report'
+      - './.nyc_output:/app/.nyc_output'
+      - './report:/app/report'
+    depends_on:
+      - keycloak    
+    
+  # --------------- #
+  #     KEYCLOAK    #
+  # --------------- #  
+  keycloak:
+    image: jboss/keycloak:6.0.1
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: h2 
+    ports:
+      - 8080:8080
+
+  # keycloak-config:
+  #   image: fireblink/fbl-plugins:1.0.86
+  #   volumes:
+  #     - ./test/keycloak-config:/config
+  #   depends_on:
+  #     - keycloak  
+  #   command: bash /config/run.sh

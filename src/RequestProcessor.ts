@@ -1,11 +1,11 @@
-import { IncomingMessage, ServerResponse } from "http";
+import { IncomingMessage, ServerResponse } from 'http';
 import {createProxyServer} from 'http-proxy';
 import {get} from 'config';
-import { IResourceDefinition, ITargetPathResult } from "./interfaces";
-import { JWT } from "./models/JWT";
+import { IResourceDefinition, ITargetPathResult } from './interfaces';
+import { JWT } from './models/JWT';
 import {parse as cookieParse, serialize} from 'cookie';
-import {$log} from "ts-log-debug";
-import { prepareAuthURL, verifyOnline, verifyOffline, prepareLogoutURL, handleCallbackRequest } from "./utils/KeycloakUtil";
+import {$log} from 'ts-log-debug';
+import { logout, prepareAuthURL, verifyOnline, verifyOffline, prepareLogoutURL, handleCallbackRequest } from './utils/KeycloakUtil';
 
 export class RequestProcessor {
     private proxy = createProxyServer();
@@ -14,15 +14,15 @@ export class RequestProcessor {
     private logoutPath: string = get('paths.logout');
     private healthPath: string = get('paths.health');
     private cookieAccessToken: string = get('cookie.accessToken');
-    private secureCookies: boolean = get('cookie.secure') === '1';
     private cookieRefreshToken: string = get('cookie.refreshToken');
+    private secureCookies: boolean = get('cookie.secure') === '1';    
     private resources: IResourceDefinition[] = JSON.parse(JSON.stringify(get('resources')));
     private jwtVerificationOnline = get('jwtVerification') === 'ONLINE';
 
     constructor() {
         this.proxy.on('error', (err) => {
             $log.error('Proxy error:', err);            
-        })
+        });
 
         for (const resource of this.resources) {
             resource.matchPattern = new RegExp(resource.match, 'i');
@@ -41,6 +41,7 @@ export class RequestProcessor {
             res.write(description, (err) => {
                 if (err) {
                     $log.warn('Unable to write response', err);
+
                     return reject(err);
                 }
 
@@ -76,13 +77,39 @@ export class RequestProcessor {
                     path: '/',
                 }),
             ]
-        );        
+        );
         
         await this.redirect(res, response.redirectTo);        
     }
 
     private async handleLogout(req: IncomingMessage, res: ServerResponse) {
         $log.debug('Handling logout request');
+        const accessToken = this.getAccessToken(req);
+        const refreshToken = this.getRefreshToken(req);
+        
+        if (accessToken && refreshToken) {
+            await logout(accessToken, refreshToken);
+        }
+
+        const expires = new Date(0);
+        res.setHeader(
+            'Set-Cookie', 
+            [
+                serialize(this.cookieAccessToken, 'deleted', {
+                    expires,
+                    secure: this.secureCookies,
+                    path: '/',
+                }),
+
+                serialize(this.cookieRefreshToken, 'deleted', {
+                    expires,
+                    secure: this.secureCookies,
+                    path: '/',
+                }),
+            ]
+        );
+        
+
         await this.redirect(res, prepareLogoutURL());
     }
 
@@ -95,6 +122,7 @@ export class RequestProcessor {
             }), (err) => {
                 if (err) {
                     $log.warn('Unable to write response', err);
+
                     return reject(err);
                 }
 
@@ -106,7 +134,7 @@ export class RequestProcessor {
     }
 
     private async handleVerificationFlow(req: IncomingMessage, res: ServerResponse, path: string, result: ITargetPathResult): Promise<JWT | null> {
-        let token = this.extractJWTToken(req);
+        const token = this.getAccessToken(req);
         
         if (!token) {
             if (result.resource.ssoFlow) {
@@ -163,7 +191,7 @@ export class RequestProcessor {
 
                 resolve();
             }); 
-        })
+        });
     }
 
     private async handleRequest(req: IncomingMessage, res: ServerResponse) {
@@ -172,16 +200,19 @@ export class RequestProcessor {
 
         if (path === this.callbackPath) {
             await this.handleCallback(req, res);
+
             return;
         }        
 
         if (path === this.logoutPath) {
             await this.handleLogout(req, res);
+
             return;
         }
 
         if (path === this.healthPath) {
             await this.handleHealth(res);
+
             return;
         }
 
@@ -189,6 +220,7 @@ export class RequestProcessor {
 
         if (!result) {
             await this.sendError(res, 404, 'Not found');
+
             return;
         }
         
@@ -219,16 +251,16 @@ export class RequestProcessor {
         this.handleRequest(req, res).catch(err => {
             $log.error('Unexpected error occurred', err);
             this.sendError(res, 500, 'Unexpected error');
-        })
+        });
     }
 
     /**
      * Extract JWT token string from Authorization header or Cookie
      * @param req 
      */
-    private extractJWTToken(req: IncomingMessage): string | null {
+    private getAccessToken(req: IncomingMessage): string | null {
         $log.debug('Trying to extract JWT from request');
-        let token: string;
+        let token: string | null = null;
 
         if (req.headers.authorization && req.headers.authorization.toLowerCase().indexOf('Bearer ') === 0) {
             token = req.headers.authorization.substring(7); // 'Bearer '.length
@@ -241,7 +273,28 @@ export class RequestProcessor {
             }
         }
         
-        $log.debug('JWT Token:', token);
+        $log.debug('Access Token:', token);
+
+        return token;
+    }
+
+    /**
+     * Extract JWT token string from Authorization header or Cookie
+     * @param req 
+     */
+    private getRefreshToken(req: IncomingMessage): string | null {
+        $log.debug('Trying to extract JWT from request');
+        let token: string | null = null;
+
+        if (!token && req.headers.cookie) {
+            if (req.headers.cookie.indexOf(this.cookieRefreshToken) >= 0) {
+                const cookies = cookieParse(req.headers.cookie);
+                token = cookies[this.cookieRefreshToken];
+            }
+        }
+        
+        $log.debug('Refresh Token:', token);
+
         return token;
     }
     
@@ -275,17 +328,19 @@ export class RequestProcessor {
             const result = {
                 path,
                 resource,
-            }
+            };
                 
             if (resource.override) {
                 result.path = path.replace(resource.matchPattern, resource.override);
             } 
 
             $log.debug('Destination resource found', result);
+
             return result;  
         }
 
         $log.debug('Destination resource not found');
+
         return null;
     }
 }

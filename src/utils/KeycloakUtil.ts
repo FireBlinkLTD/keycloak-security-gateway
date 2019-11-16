@@ -9,6 +9,7 @@ import { $log } from 'ts-log-debug';
 
 const host: string = get('host');
 const callbackPath: string = get('paths.callback');
+const logoutRedirectURL: string = get('logoutRedirectURL');
 const scopes: string[] = get('keycloak.scopes') || [];
 const publicRealmURL: string = get('keycloak.realmURL.public');
 const privateRealmURL: string = get('keycloak.realmURL.private');
@@ -40,12 +41,27 @@ const prepareAuthURL = (path: string): string => {
     ].join('');
 };
 
+const logout = async (accessToken: string, refreshToken: string): Promise<void> => {
+    await request('/protocol/openid-connect/logout', {
+        method: 'POST',
+        data: stringify({
+            refresh_token: refreshToken,
+            client_id: clientId,
+        }),
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+};
+
 const prepareLogoutURL = (): string => {
-    return [
-        publicRealmURL,
-        '/protocol/openid-connect/logout',
-        `&redirect_uri=${encodeURIComponent(host)}`, // TODO: add ability to override
-    ].join('');
+    let redirectTo = logoutRedirectURL;
+    if (logoutRedirectURL.indexOf('/') === 0) {
+        redirectTo = host + logoutRedirectURL;
+    }
+
+    return redirectTo;
 };
 
 const handleCallbackRequest = async (url: string): Promise<ITokenResponse> => {
@@ -152,4 +168,4 @@ const verifyOnline = async (accessToken: string): Promise<JWT | null> => {
     return jwtToken;
 };
 
-export { prepareAuthURL, prepareLogoutURL, verifyOffline, verifyOnline, handleCallbackRequest };
+export { logout, prepareAuthURL, prepareLogoutURL, verifyOffline, verifyOnline, handleCallbackRequest };

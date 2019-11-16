@@ -48,7 +48,7 @@ class SSOFlow {
     }
 
     @test()
-    async SSOFlow() {        
+    async SSOFlow() {
         console.log('-> Opening browser page');
         const page = await this.browser.newPage();
 
@@ -59,7 +59,7 @@ class SSOFlow {
 
         let body = await page.evaluate(() => document.querySelector('pre').innerHTML);
         strictEqual(body, 'Unathorized');
-        
+
         console.log('-> Opening /sso/ page');
         await page.goto(get('host') + '/sso/', {
             waitUntil: 'networkidle0',
@@ -90,7 +90,17 @@ class SSOFlow {
 
         body = await page.evaluate(() => document.querySelector('pre').innerHTML);
         const json = JSON.parse(body);
-        
-        deepStrictEqual(json, {success: true});
+
+        deepStrictEqual(json, { success: true });
+
+        // logout
+        console.log('-> Open /logout page');
+        await page.goto(get('host') + '/logout', {
+            waitUntil: 'networkidle0',
+        });
+
+        body = await page.evaluate(() => document.querySelector('pre').innerHTML);
+        strictEqual(body, 'Unathorized');
+        strictEqual(page.url(), get('host') + '/');
     }
 }

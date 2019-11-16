@@ -17,7 +17,8 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 - `APP_KEYCLOAK_PRIVATE_REALM_URL` - Keycloak's realm URL (local DNS, used for API integration), e.g: `http://keycloak.default.svc.cluster.local:8080/auth/realms/master`
 - `APP_KEYCLOAK_SCOPES` - Additional client scopes in JSON string, e.g. `["openvpn","other"]`
 
-- `APP_UPSTREAM_URL` - Upstream url to forward requests to
+- `APP_UPSTREAM_URL` - Upstream URL to forward requests to
+- `APP_LOGOUT_REDIRECT_URL` - URL or relative path to redirect user after logout
 
 - `APP_PATHS_CALLBACK` - Routing path to use for SSO authentication callback, e.g. `/oauth/callback`
 - `APP_PATHS_LOGOUT` - Logout path to use, e.g. `/logout`

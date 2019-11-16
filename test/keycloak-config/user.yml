@@ -15,3 +15,14 @@ pipeline:
           email: john@localhost
           firstName: John
           lastName: Doe
+          
+    - 'keycloak.user.mappings.roles.add':
+        credentials: $ref:secrets.credentials
+        realmName: $ref:ctx.realmName
+        username: test
+        roles:
+          realm:
+            - realm_role
+          client:
+            test:
+              - test

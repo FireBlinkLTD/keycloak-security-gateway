@@ -21,6 +21,8 @@ paths:
   callback: /oauth/callback
   logout: /logout 
   health: /healthz
+  
+logoutRedirectURL: /
 
 cookie:
   secure: '1'

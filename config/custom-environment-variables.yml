@@ -24,6 +24,8 @@ paths:
   logout: APP_PATHS_LOGOUT
   health: APP_PATHS_HEALTH
 
+logoutRedirectURL: APP_LOGOUT_REDIRECT_URL
+
 cookie:
   secure: APP_COOKIE_SECURE
   accessToken: APP_COOKIE_ACCESS_TOKEN

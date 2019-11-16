@@ -3,10 +3,12 @@ import { get } from 'config';
 import * as puppeteer from 'puppeteer';
 import { start, stop } from '../../src';
 import { createServer, Server } from 'http';
+import { deepStrictEqual, strictEqual } from 'assert';
 
 @suite()
 class SSOFlow {
     private server: Server;
+    private browser: puppeteer.Browser;
 
     async before() {
         await start();
@@ -32,23 +34,33 @@ class SSOFlow {
                 resolve();
             });
         });
+
+        this.browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
     }
 
     async after() {
+        await this.browser.close();
         await stop();
         this.server.close();
         this.server = null;
     }
 
     @test()
-    async SSOFlow() {
-        const browser = await puppeteer.launch({
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    async SSOFlow() {        
+        console.log('-> Opening browser page');
+        const page = await this.browser.newPage();
+
+        console.log('-> Opening /api page');
+        await page.goto(get('host') + '/api', {
+            waitUntil: 'networkidle0',
         });
 
-        console.log('-> Opening browser page');
-        const page = await browser.newPage();
-        console.log('-> Opening browser page');
+        let body = await page.evaluate(() => document.querySelector('pre').innerHTML);
+        strictEqual(body, 'Unathorized');
+        
+        console.log('-> Opening /sso/ page');
         await page.goto(get('host') + '/sso/', {
             waitUntil: 'networkidle0',
         });
@@ -71,6 +83,14 @@ class SSOFlow {
 
         await page.screenshot({ path: 'report/2.png' });
 
-        await browser.close();
+        console.log('-> Open /api page');
+        await page.goto(get('host') + '/api', {
+            waitUntil: 'networkidle0',
+        });
+
+        body = await page.evaluate(() => document.querySelector('pre').innerHTML);
+        const json = JSON.parse(body);
+        
+        deepStrictEqual(json, {success: true});
     }
 }

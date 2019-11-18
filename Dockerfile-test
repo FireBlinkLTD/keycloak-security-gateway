@@ -8,7 +8,7 @@ RUN yarn
 COPY . .
 RUN yarn build 
 
-FROM fireblink/fbl-plugins:1.0.86
+FROM fireblink/fbl-plugins:1.0.89
 
 WORKDIR /app
 

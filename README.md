@@ -1,6 +1,16 @@
-# @fireblink/keycloak-security-gateway
+# fireblink/keycloak-security-gateway
 
-Node.js based proxy service to secure applications and integrate with Keycloak SSO flow.
+Node.js based proxy service to secure applications and integrate with Keycloak SSO flow with extra cool benefits:
+
+| Feature                                                                           | fireblink/keycloak-security-gateway | keycloak/keycloak-gatekeeper |
+| --------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------- |
+| Ability to use internal to cluster Keycloak address for API integration           | Yes                                 | No                           |
+| Use SSO flow for UI endpoints only                                                | Yes                                 | No                           |
+| Redirect to custom address upon logout                                            | Yes                                 | No                           |
+| Ability to specify target interface to listen incomming connections               | Yes                                 | No                           |
+| Specify custom Cookie names                                                       | Yes                                 | No                           |
+| JWT online verification stratagy                                                  | Yes                                 | No                           |
+| Flexible role based access (like: at least one of roles required, not simply all) | Yes                                 | No                           |
 
 ## Configuration
 

@@ -1,5 +1,7 @@
 # fireblink/keycloak-security-gateway
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/FireBlinkLTD/keycloak-security-gateway.svg)](https://greenkeeper.io/)
+
 Node.js based proxy service to secure applications and integrate with Keycloak SSO flow with extra cool benefits:
 
 | Feature                                                                           | fireblink/keycloak-security-gateway | keycloak/keycloak-gatekeeper |

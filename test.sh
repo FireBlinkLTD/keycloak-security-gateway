@@ -9,3 +9,5 @@ done
 fbl /app/test/keycloak-config --verbose
 
 yarn test
+
+./node_modules/.bin/nyc report --reporter=text-lcov > /app/report/coverage.lcov

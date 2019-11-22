@@ -13,7 +13,7 @@
     "start": "node dist/src/",
     "test": "nyc --reporter=html --reporter=text mocha",
     "build": "rimraf ./dist/ && tsc",
-    "docker:test": "rimraf ./coverage && docker-compose up --build --abort-on-container-exit",
+    "docker:test": "rimraf ./coverage && rimraf ./.nyc_output && docker-compose up --build --abort-on-container-exit",
     "lint": "tslint -c tslint.json src/**/*.ts test/**/*.ts index.ts",
     "prettify": "prettier src/**/*.{md,ts,json} test/**/*.{md,ts,json} index.{md,ts,json} --write --config .prettierrc.yml && tslint 'src/**/*.ts' 'test/**/*.ts' 'index.ts' --fix",
     "prepublishOnly": "npm run build"

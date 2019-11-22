@@ -19,7 +19,7 @@ pipeline:
     - 'keycloak.user.mappings.roles.add':
         credentials: $ref:secrets.credentials
         realmName: $ref:ctx.realmName
-        username: test
+        email: john@localhost
         roles:
           realm:
             - realm_role

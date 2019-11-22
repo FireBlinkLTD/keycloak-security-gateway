@@ -1,6 +1,6 @@
 requires:
   plugins:
-    '@fbl-plugins/keycloak-admin-client': '>=1.4.0'
+    '@fbl-plugins/keycloak-admin-client': '>=1.4.1'
 
 pipeline:
   '--':

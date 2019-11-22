@@ -20,15 +20,15 @@ class SSOFlow {
                     res.write('<body id="loginSuccess"></body>', () => {
                         res.end();
                     });
+
+                    return;
                 }
 
-                if (req.url === '/api') {
-                    res.statusCode = 200;
-                    res.setHeader('content-type', 'application/json');
-                    res.write('{"success":true}', () => {
-                        res.end();
-                    });
-                }
+                res.statusCode = 200;
+                res.setHeader('content-type', 'application/json');
+                res.write('{"success":true}', () => {
+                    res.end();
+                });
             });
             this.server.listen(7777, '0.0.0.0', () => {
                 resolve();
@@ -89,9 +89,23 @@ class SSOFlow {
         });
 
         body = await page.evaluate(() => document.querySelector('pre').innerHTML);
-        const json = JSON.parse(body);
+        deepStrictEqual(JSON.parse(body), { success: true });
 
-        deepStrictEqual(json, { success: true });
+        console.log('-> Open /api/roles/all page');
+        await page.goto(get('host') + '/api/roles/all', {
+            waitUntil: 'networkidle0',
+        });
+
+        body = await page.evaluate(() => document.querySelector('pre').innerHTML);
+        deepStrictEqual(JSON.parse(body), { success: true });
+
+        console.log('-> Open /api/roles/any page');
+        await page.goto(get('host') + '/api/roles/any', {
+            waitUntil: 'networkidle0',
+        });
+
+        body = await page.evaluate(() => document.querySelector('pre').innerHTML);
+        deepStrictEqual(JSON.parse(body), { success: true });
 
         // logout
         console.log('-> Open /logout page');

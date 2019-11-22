@@ -39,7 +39,6 @@ export class JWT {
 
     /**
      * Verify roles
-     * @param roles
      */
     verifyRoles(roles: { any?: string[]; all?: string[] }): boolean {
         if (roles.all) {
@@ -50,6 +49,8 @@ export class JWT {
                     return false;
                 }
             }
+
+            $log.debug('Roles from "all" block are matched');
         }
 
         if (roles.any && roles.any.length) {
@@ -93,31 +94,26 @@ export class JWT {
     }
 
     /**
-     * Check if role exists
+     * Check if JWT has role
      * Examples:
-     *  - realm_role
-     *  - client_id:client_role
-     *  - client_id:client:role
-     * @param {string} roleName
-     * @return {boolean}
+     *  - realm_role - for realm level
+     *  - client_id:client_role - for client level
      */
     hasRole(roleName: string): boolean {
-        if (roleName.indexOf(':') < 1) {
+        if (roleName.indexOf(':') < 0) {
             return this.hasRealmRole(roleName);
         } else {
             const parts = roleName.split(':');
 
-            return this.hasApplicationRole(parts[0], roleName.substring(parts[0].length + 1));
+            return this.hasClientRole(parts[0], roleName.substring(parts[0].length + 1));
         }
     }
 
     /**
-     * @param {string} appName
-     * @param {string} roleName
-     * @return {boolean}
+     * Check if JWT has client role
      */
-    private hasApplicationRole(appName: string, roleName: string): boolean {
-        const appRoles = this.content.resource_access[appName];
+    private hasClientRole(clientId: string, roleName: string): boolean {
+        const appRoles = this.content.resource_access[clientId];
 
         if (!appRoles) {
             return false;
@@ -127,8 +123,7 @@ export class JWT {
     }
 
     /**
-     * @param {string} roleName
-     * @return {boolean}
+     * Check if JWT has realm role
      */
     private hasRealmRole(roleName: string): boolean {
         if (!this.content.realm_access || !this.content.realm_access.roles) {

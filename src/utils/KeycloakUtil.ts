@@ -29,7 +29,7 @@ const certCache: { [kid: string]: string } = {};
 const prepareAuthURL = (path: string): string => {
     const redirectUri = [host, callbackPath, `?src=${encodeURIComponent(path)}`].join('');
 
-    const scope = ['openid', 'email', 'profile', ...scopes].join('+');
+    const scope = ['openid', 'email', 'profile', ...scopes].join(' ');
 
     return [
         publicRealmURL,
@@ -37,16 +37,22 @@ const prepareAuthURL = (path: string): string => {
         `?client_id=${encodeURIComponent(clientId)}`,
         `&redirect_uri=${encodeURIComponent(redirectUri)}`,
         '&response_type=code',
-        `&scope=${scope}`,
+        `&scope=${encodeURIComponent(scope)}`,
     ].join('');
 };
 
+/**
+ * Logout user
+ * @param accessToken
+ * @param refreshToken
+ */
 const logout = async (accessToken: string, refreshToken: string): Promise<void> => {
     await request('/protocol/openid-connect/logout', {
         method: 'POST',
         data: stringify({
             refresh_token: refreshToken,
             client_id: clientId,
+            client_secret: clientSecret,
         }),
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -55,7 +61,10 @@ const logout = async (accessToken: string, refreshToken: string): Promise<void> 
     });
 };
 
-const prepareLogoutURL = (): string => {
+/**
+ * Prepare post logout URL
+ */
+const preparePostLogoutURL = (): string => {
     let redirectTo = logoutRedirectURL;
     if (logoutRedirectURL.indexOf('/') === 0) {
         redirectTo = host + logoutRedirectURL;
@@ -64,6 +73,10 @@ const prepareLogoutURL = (): string => {
     return redirectTo;
 };
 
+/**
+ * Handle authorization callback request
+ * @param url
+ */
 const handleCallbackRequest = async (url: string): Promise<ITokenResponse> => {
     const queryString = url.substring(url.indexOf('?') + 1);
     const query = parse(queryString);
@@ -114,6 +127,10 @@ const verifyOffline = async (accessToken: string): Promise<JWT | null> => {
     });
 };
 
+/**
+ * Get public certificate from server to verify signature of a given JWT
+ * @param jwtToken
+ */
 const getPublicCert = async (jwtToken: JWT): Promise<string> => {
     $log.debug('Looking for public certificate...');
 
@@ -136,6 +153,9 @@ const getPublicCert = async (jwtToken: JWT): Promise<string> => {
     return (certCache[jwtToken.header.kid] = getPublicKey(key));
 };
 
+/**
+ * Load opeind certificates from server
+ */
 const getCerts = async (): Promise<any> => {
     $log.debug('Load certificates from KeyCloak server...');
     const response = await request.get(`/protocol/openid-connect/certs`);
@@ -168,4 +188,4 @@ const verifyOnline = async (accessToken: string): Promise<JWT | null> => {
     return jwtToken;
 };
 
-export { logout, prepareAuthURL, prepareLogoutURL, verifyOffline, verifyOnline, handleCallbackRequest };
+export { logout, prepareAuthURL, preparePostLogoutURL, verifyOffline, verifyOnline, handleCallbackRequest };

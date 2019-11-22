@@ -1,16 +1,21 @@
 # fireblink/keycloak-security-gateway
 
+[![CircleCI](https://circleci.com/gh/FireBlinkLTD/keycloak-security-gateway.svg?style=svg)](https://circleci.com/gh/FireBlinkLTD/keycloak-security-gateway)
+[![codecov](https://codecov.io/gh/FireBlinkLTD/keycloak-security-gateway/branch/master/graph/badge.svg)](https://codecov.io/gh/FireBlinkLTD/keycloak-security-gateway)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/FireBlinkLTD/keycloak-security-gateway.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FireBlinkLTD/keycloak-security-gateway/context:javascript)
+[![Greenkeeper badge](https://badges.greenkeeper.io/FireBlinkLTD/keycloak-security-gateway.svg)](https://greenkeeper.io/)
+
 Node.js based proxy service to secure applications and integrate with Keycloak SSO flow with extra cool benefits:
 
-| Feature                                                                           | fireblink/keycloak-security-gateway | keycloak/keycloak-gatekeeper |
-| --------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------- |
-| Ability to use internal to cluster Keycloak address for API integration           | Yes                                 | No                           |
-| Use SSO flow for UI endpoints only                                                | Yes                                 | No                           |
-| Redirect to custom address upon logout                                            | Yes                                 | No                           |
-| Ability to specify target interface to listen incomming connections               | Yes                                 | No                           |
-| Specify custom Cookie names                                                       | Yes                                 | No                           |
-| JWT online verification stratagy                                                  | Yes                                 | No                           |
-| Flexible role based access (like: at least one of roles required, not simply all) | Yes                                 | No                           |
+| Feature                                                                               | fireblink/keycloak-security-gateway | keycloak/keycloak-gatekeeper                                          |
+| ------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------- |
+| Ability to use internal to cluster Keycloak address for API integration               | Yes                                 | No                                                                    |
+| Use SSO flow for UI endpoints only                                                    | Yes                                 | No                                                                    |
+| Redirect to custom address upon logout                                                | Yes                                 | No                                                                    |
+| Ability to specify target interface to listen incomming connections                   | Yes                                 | No                                                                    |
+| Specify custom Cookie names                                                           | Yes                                 | No                                                                    |
+| JWT online verification stratagy                                                      | Yes                                 | No                                                                    |
+| Flexible role based access (like: at least one of the roles required, not simply all) | Yes                                 | Yes (either all or at least one, but not both rules at the same time) |
 
 ## Configuration
 
@@ -25,7 +30,7 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 - `APP_KEYCLOAK_CLIENT_SECRET` - Keycloak's client secret
 - `APP_KEYCLOAK_PUBLIC_REALM_URL` - Keycloak's realm URL (public facing, used for SSO redirects), e.g: `https://keycloak.example.com/auth/realms/master`
 - `APP_KEYCLOAK_PRIVATE_REALM_URL` - Keycloak's realm URL (local DNS, used for API integration), e.g: `http://keycloak.default.svc.cluster.local:8080/auth/realms/master`
-- `APP_KEYCLOAK_SCOPES` - Additional client scopes in JSON string, e.g. `["openvpn","other"]`
+- `APP_KEYCLOAK_SCOPES` - Additional client scopes in JSON string, e.g. `["address","phone"]`
 
 - `APP_UPSTREAM_URL` - Upstream URL to forward requests to
 - `APP_LOGOUT_REDIRECT_URL` - URL or relative path to redirect user after logout

@@ -2,6 +2,7 @@
 
 !src
 !config/default.yml
+!config/test.yml
 !config/custom-environment-variables.yml
 
 !package.json

@@ -1,0 +1,60 @@
+# the client id for the 'client' application
+port: 8888
+interface: 0.0.0.0
+host: http://localhost:8888
+
+log:
+  level: debug
+
+keycloak:
+  clientId: test
+  clientSecret: 9067b642-015a-441a-816b-0c8d19305d10
+  realmURL: 
+    public: http://keycloak:8080/auth/realms/local
+    private: http://keycloak:8080/auth/realms/local
+
+# the upstream endpoint which we should proxy request
+upstreamURL: http://localhost:7777
+
+# additional scopes to add to add to the default (openid+email+profile)
+scopes: []
+
+paths:
+  callback: /oauth/callback
+  logout: /logout 
+  health: /healthz
+
+logoutRedirectURL: /
+
+cookie:  
+  secure: '0'
+  accessToken: ACCESS_TOKEN
+  refreshToken: REFRESH_TOKEN
+
+# a collection of resource i.e. urls that you wish to protect
+resources:
+  - match: /sso/.*
+    ssoFlow: true
+
+  - match: /api
+  - match: /
+  
+  - match: /api/roles/all
+    roles: 
+      all: 
+        - realm_role
+        - test:test
+
+  - match: /api/roles/any
+    roles: 
+      any: 
+        - realm_role
+        - test:test
+      
+jwtVerification: OFFLINE
+
+  
+  
+  
+
+

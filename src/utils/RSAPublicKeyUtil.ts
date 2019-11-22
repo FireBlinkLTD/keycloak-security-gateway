@@ -9,6 +9,7 @@ const getPublicKey = (key: any): string => {
     const bufferSource = `30${encodeLength(part + 2)}02${encModLen}${mod}02${encExpLen}${exp}`;
     const pubkey = Buffer.from(bufferSource, 'hex').toString('base64');
 
+    /* istanbul ignore next */
     return (
         '-----BEGIN RSA PUBLIC KEY-----\n' +
         (pubkey.match(/.{1,64}/g) || []).join('\n') +

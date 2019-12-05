@@ -1,8 +1,8 @@
 pull_request_rules:
   - name: automatic merge of greenkeeper PRs to develop branch
     conditions:
-      - 'status-success=ci/circleci: build'    
-      - 'base=develop'
+      - 'status-success=ci/circleci: build'
+      - 'base=master'
       - 'author=greenkeeper[bot]'
     actions:
       merge:

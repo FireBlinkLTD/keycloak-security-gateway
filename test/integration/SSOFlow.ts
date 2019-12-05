@@ -107,6 +107,20 @@ class SSOFlow {
         body = await page.evaluate(() => document.querySelector('pre').innerHTML);
         deepStrictEqual(JSON.parse(body), { success: true });
 
+        // verify refresh token flow
+        await page.setCookie({
+            name: get('cookie.accessToken'),
+            value: 'deleted',
+            expires: new Date(0).getTime(),
+        });
+
+        await page.goto(get('host') + '/sso/', {
+            waitUntil: 'networkidle0',
+        });
+
+        await page.waitFor('#loginSuccess');
+        await page.screenshot({ path: 'report/3.png' });
+
         // logout
         console.log('-> Open /logout page');
         await page.goto(get('host') + '/logout', {

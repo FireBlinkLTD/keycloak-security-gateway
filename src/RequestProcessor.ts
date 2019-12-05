@@ -12,6 +12,7 @@ import {
     verifyOffline,
     preparePostLogoutURL,
     handleCallbackRequest,
+    refresh,
 } from './utils/KeycloakUtil';
 
 export class RequestProcessor {
@@ -170,6 +171,43 @@ export class RequestProcessor {
         });
     }
 
+    private async handleUnathorizedFlow(
+        req: IncomingMessage,
+        res: ServerResponse,
+        path: string,
+        result: ITargetPathResult,
+    ): Promise<string | null> {
+        $log.debug('Handling unauthorized flow');
+        if (result.resource.ssoFlow) {
+            const refreshToken = this.getRefreshToken(req);
+
+            if (refreshToken) {
+                const jwtToken = new JWT(refreshToken);
+                if (!jwtToken.isExpired()) {
+                    $log.debug('Found unexpired refresh token. Refreshing access one...');
+                    const refreshResponse = await refresh(refreshToken);
+
+                    res.setHeader('Set-Cookie', [
+                        serialize(this.cookieAccessToken, refreshResponse.access_token, {
+                            expires: new Date(Date.now() + refreshResponse.expires_in * 1000 - 1000),
+                            secure: this.secureCookies,
+                            path: '/',
+                        }),
+                    ]);
+
+                    return refreshResponse.access_token;
+                }
+            }
+
+            const authURL = prepareAuthURL(path);
+            await this.redirect(res, authURL);
+        } else {
+            await this.sendError(res, 401, 'Unathorized');
+        }
+
+        return null;
+    }
+
     /**
      * Handle JWT verification flow
      * @param req
@@ -183,30 +221,33 @@ export class RequestProcessor {
         path: string,
         result: ITargetPathResult,
     ): Promise<JWT | null> {
-        const token = this.getAccessToken(req);
+        let token = this.getAccessToken(req);
+        let jwt: JWT;
 
         if (!token) {
-            if (result.resource.ssoFlow) {
-                const authURL = prepareAuthURL(path);
-                await this.redirect(res, authURL);
-            } else {
-                await this.sendError(res, 401, 'Unathorized');
+            token = await this.handleUnathorizedFlow(req, res, path, result);
+
+            if (!token) {
+                return null;
             }
 
-            return null;
-        }
-
-        let jwt: JWT;
-        if (this.jwtVerificationOnline) {
-            jwt = await verifyOnline(token);
+            jwt = new JWT(token);
         } else {
-            jwt = await verifyOffline(token);
+            if (this.jwtVerificationOnline) {
+                jwt = await verifyOnline(token);
+            } else {
+                jwt = await verifyOffline(token);
+            }
         }
 
         if (!jwt) {
-            await this.sendError(res, 401, 'Unathorized');
+            token = await this.handleUnathorizedFlow(req, res, path, result);
 
-            return null;
+            if (!token) {
+                return null;
+            }
+
+            jwt = new JWT(token);
         }
 
         if (result.resource.roles) {
@@ -338,7 +379,7 @@ export class RequestProcessor {
      * @param req
      */
     private getRefreshToken(req: IncomingMessage): string | null {
-        $log.debug('Trying to extract JWT from request');
+        $log.debug('Trying to extract refresh token from request');
         let token: string | null = null;
         if (req.headers.cookie && req.headers.cookie.indexOf(this.cookieRefreshToken) >= 0) {
             const cookies = cookieParse(req.headers.cookie);

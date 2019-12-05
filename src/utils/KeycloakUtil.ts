@@ -42,6 +42,27 @@ const prepareAuthURL = (path: string): string => {
 };
 
 /**
+ * Refresh access token
+ * @param refreshToken
+ */
+const refresh = async (refreshToken: string): Promise<ITokenResponse> => {
+    const result = await request('/protocol/openid-connect/token', {
+        method: 'POST',
+        data: stringify({
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+            client_id: clientId,
+            client_secret: clientSecret,
+        }),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+
+    return result.data;
+};
+
+/**
  * Logout user
  * @param accessToken
  * @param refreshToken
@@ -188,4 +209,12 @@ const verifyOnline = async (accessToken: string): Promise<JWT | null> => {
     return jwtToken;
 };
 
-export { logout, prepareAuthURL, preparePostLogoutURL, verifyOffline, verifyOnline, handleCallbackRequest };
+export {
+    refresh,
+    logout,
+    prepareAuthURL,
+    preparePostLogoutURL,
+    verifyOffline,
+    verifyOnline,
+    handleCallbackRequest,
+};

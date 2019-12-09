@@ -5,6 +5,7 @@ import { IResourceDefinition, ITargetPathResult } from './interfaces';
 import { JWT } from './models/JWT';
 import { parse as cookieParse, serialize } from 'cookie';
 import { $log } from 'ts-log-debug';
+import * as ejs from 'ejs';
 import {
     logout,
     prepareAuthURL,
@@ -26,6 +27,7 @@ export class RequestProcessor {
     private secureCookies: boolean = get('cookie.secure') === '1';
     private resources: IResourceDefinition[] = JSON.parse(JSON.stringify(get('resources')));
     private jwtVerificationOnline = get('jwtVerification') === 'ONLINE';
+    private additionalHeaders: { [name: string]: string } = get('headers');
 
     constructor() {
         this.proxy.on('error', err => {
@@ -266,6 +268,24 @@ export class RequestProcessor {
     private async proxyRequest(req: IncomingMessage, res: ServerResponse, target: string, jwt: JWT) {
         $log.info('Proxy request to:', target);
 
+        let headers: { [name: string]: string } = {
+            'X-Auth-Token': jwt.token,
+            'X-Auth-Roles': jwt.getAllRoles().join(','),
+            'X-Auth-Username': jwt.content.preferred_username,
+            'X-Auth-Email': jwt.content.email,
+        };
+
+        // add x- forward headers if original request missing them
+        const xfwd = !req.headers['x-forwarded-for'];
+
+        for (const header of Object.keys(this.additionalHeaders)) {
+            const value = this.additionalHeaders[header];
+            headers[header] = ejs.render(value, {
+                jwt,
+                req,
+            });
+        }
+
         await new Promise((resolve, reject) => {
             this.proxy.web(
                 req,
@@ -273,12 +293,8 @@ export class RequestProcessor {
                 {
                     target,
                     ignorePath: true,
-                    headers: {
-                        'X-Auth-Token': jwt.token,
-                        'X-Auth-Roles': jwt.getAllRoles().join(','),
-                        'X-Auth-Username': jwt.content.preferred_username,
-                        'X-Auth-Email': jwt.content.email,
-                    },
+                    headers,
+                    xfwd,
                 },
                 err => {
                     if (err) {
@@ -358,7 +374,7 @@ export class RequestProcessor {
         $log.debug('Trying to extract JWT from request');
         let token: string | null = null;
 
-        if (req.headers.authorization && req.headers.authorization.toLowerCase().indexOf('Bearer ') === 0) {
+        if (req.headers.authorization && req.headers.authorization.toLowerCase().indexOf('bearer ') === 0) {
             token = req.headers.authorization.substring(7); // 'Bearer '.length
         }
 

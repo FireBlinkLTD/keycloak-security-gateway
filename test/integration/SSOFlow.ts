@@ -48,7 +48,7 @@ class SSOFlow {
     }
 
     @test()
-    async SSOFlow() {
+    async flow() {
         console.log('-> Opening browser page');
         const page = await this.browser.newPage();
 

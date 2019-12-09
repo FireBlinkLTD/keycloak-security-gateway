@@ -9,11 +9,11 @@ log:
 keycloak:
   clientId: APP_KEYCLOAK_CLIENT_ID
   clientSecret: APP_KEYCLOAK_CLIENT_SECRET
-  realmURL: 
+  realmURL:
     public: APP_KEYCLOAK_PUBLIC_REALM_URL
     private: APP_KEYCLOAK_PRIVATE_REALM_URL
 
-  scopes: 
+  scopes:
     __name: APP_KEYCLOAK_SCOPES
     __format: json
 
@@ -26,14 +26,18 @@ paths:
 
 logoutRedirectURL: APP_LOGOUT_REDIRECT_URL
 
+headers:
+  __name: APP_HEADERS
+  __format: json
+
 cookie:
   secure: APP_COOKIE_SECURE
   accessToken: APP_COOKIE_ACCESS_TOKEN
   refreshToken: APP_COOKIE_REFRESH_TOKEN
-  
+
 jwtVerification: APP_JWT_VERIFICATION_MODE
 
 resources:
   __name: APP_RESOURCES
-  __format: json  
+  __format: json
 

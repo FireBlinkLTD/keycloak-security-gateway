@@ -9,7 +9,7 @@ log:
 keycloak:
   clientId: test
   clientSecret: 9067b642-015a-441a-816b-0c8d19305d10
-  realmURL: 
+  realmURL:
     public: http://keycloak:8080/auth/realms/local
     private: http://keycloak:8080/auth/realms/local
 
@@ -21,12 +21,14 @@ scopes: []
 
 paths:
   callback: /oauth/callback
-  logout: /logout 
+  logout: /logout
   health: /healthz
 
 logoutRedirectURL: /
+headers:
+  'X-TEST': '<%- !!jwt %>'
 
-cookie:  
+cookie:
   secure: '0'
   accessToken: ACCESS_TOKEN
   refreshToken: REFRESH_TOKEN
@@ -38,23 +40,23 @@ resources:
 
   - match: /api
   - match: /
-  
+
   - match: /api/roles/all
-    roles: 
-      all: 
+    roles:
+      all:
         - realm_role
         - test:test
 
   - match: /api/roles/any
-    roles: 
-      any: 
+    roles:
+      any:
         - realm_role
         - test:test
-      
+
 jwtVerification: OFFLINE
 
-  
-  
-  
+
+
+
 
 

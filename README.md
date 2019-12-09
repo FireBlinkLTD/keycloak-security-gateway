@@ -45,6 +45,7 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 
 - `APP_JWT_VERIFICATION_MODE` - JWT verification mode, either `ONLINE` or `OFFLINE`
 - `APP_RESOURCES` - JSON formatted configuration for resource matching
+- `APP_HEADERS` - JSON formatted key-value object of extra headers to add, value can be EJS template
 
 ## Resources Configuration
 

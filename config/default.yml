@@ -8,21 +8,23 @@ log:
 keycloak:
   clientId: <CLIENT_ID>
   clientSecret: <CLIENT_SECRET>
-  realmURL: 
+  realmURL:
     public: https://keycloak.example.com/auth/realms/<REALM_NAME>
     private: https://keycloak.example.com/auth/realms/<REALM_NAME>
   # additional scopes to add to add to the default (openid+email+profile)
-  scopes: []    
+  scopes: []
 
 # the upstream endpoint which we should proxy request
 upstreamURL: http://127.0.0.1:80
 
 paths:
   callback: /oauth/callback
-  logout: /logout 
+  logout: /logout
   health: /healthz
-  
+
 logoutRedirectURL: /
+
+headers: {}
 
 cookie:
   secure: '1'
@@ -32,10 +34,10 @@ cookie:
 # a collection of resource i.e. urls that you wish to protect
 resources: []
 
-jwtVerification: OFFLINE # or ONLINE 
+jwtVerification: OFFLINE # or ONLINE
 
-  
-  
-  
+
+
+
 
 

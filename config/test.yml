@@ -35,8 +35,9 @@ cookie:
 
 # a collection of resource i.e. urls that you wish to protect
 resources:
-  - match: /sso/.*
-    clientId: test
+  - match: \/sso\/([^\/]+)(\/.*)
+    override: /sso$2
+    clientId: $1
     ssoFlow: true
 
   - match: /api

@@ -443,14 +443,21 @@ export class RequestProcessor {
             }
 
             // try to match pattern
-            if (!resource.matchPattern.exec(path)) {
+            const match = resource.matchPattern.exec(path);
+            if (!match) {
                 continue;
             }
 
             const result = {
                 path,
-                resource,
+                resource: {
+                    ...resource,
+                },
             };
+
+            if (resource.clientId && resource.clientId[0] === '$') {
+                result.resource.clientId = match[Number(resource.clientId.substring(1))];
+            }
 
             if (resource.override) {
                 result.path = path.replace(resource.matchPattern, resource.override);

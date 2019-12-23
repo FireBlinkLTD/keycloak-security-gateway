@@ -61,7 +61,7 @@ class SSOFlow {
         strictEqual(body, 'Unathorized');
 
         console.log('-> Opening /sso/ page');
-        await page.goto(get('host') + '/sso/', {
+        await page.goto(get('host') + '/sso/test/', {
             waitUntil: 'networkidle0',
         });
 
@@ -114,7 +114,7 @@ class SSOFlow {
             expires: new Date(0).getTime(),
         });
 
-        await page.goto(get('host') + '/sso/', {
+        await page.goto(get('host') + '/sso/test/', {
             waitUntil: 'networkidle0',
         });
 

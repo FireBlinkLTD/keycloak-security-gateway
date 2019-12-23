@@ -1,27 +1,38 @@
+# Port to listen for incoming connections
 port: 3000
+# Interface to listen
 interface: 127.0.0.1
+# Public facing hostname
 host: http://127.0.0.1:3000
 
 log:
   level: info
 
 keycloak:
+  # client_id/secret pairs of supported KC clients
   clients:
     <CLIENT_ID>: <CLIENT_SECRET>
+
   realmURL:
     public: https://keycloak.example.com/auth/realms/<REALM_NAME>
     private: https://keycloak.example.com/auth/realms/<REALM_NAME>
-  # additional scopes to add to add to the default (openid+email+profile)
+
+    # additional scopes to add to add to the default (openid+email+profile)
   scopes: []
 
 # the upstream endpoint which we should proxy request
 upstreamURL: http://127.0.0.1:80
 
+# Extra URL handlers paths
 paths:
+  # OID callback path
   callback: /oauth/callback
+  # User logout path
   logout: /logout
+  # Application healthcheck endpoint
   health: /healthz
 
+# Redirect URL to be used upon logout
 logoutRedirectURL: /
 
 headers: {}

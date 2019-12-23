@@ -5,6 +5,7 @@ import { createServer, Server, IncomingHttpHeaders } from 'http';
 import axios from 'axios';
 import { deepStrictEqual, strictEqual } from 'assert';
 import { stringify } from 'querystring';
+const clients: { [clientId: string]: string } = get('keycloak.clients');
 
 @suite()
 class APIFlow {
@@ -74,8 +75,8 @@ class APIFlow {
             method: 'POST',
             data: stringify({
                 grant_type: 'client_credentials',
-                client_id: get('keycloak.clientId'),
-                client_secret: get('keycloak.clientSecret'),
+                client_id: 'test',
+                client_secret: clients.test,
             }),
         });
 

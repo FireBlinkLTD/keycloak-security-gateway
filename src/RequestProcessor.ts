@@ -34,7 +34,21 @@ export class RequestProcessor {
             $log.error('Proxy error:', err);
         });
 
+        if (!this.resources) {
+            this.resources = [
+                {
+                    match: '.*',
+                },
+            ];
+        }
+
         for (const resource of this.resources) {
+            if (resource.ssoFlow && !resource.clientId) {
+                throw new Error(
+                    `"clientId" is missing in resource definition that matches: "${resource.match}" and has ssoFlow enabled`,
+                );
+            }
+
             let match = resource.match;
 
             if (match.indexOf('^') !== 0) {
@@ -201,7 +215,7 @@ export class RequestProcessor {
                 }
             }
 
-            const authURL = prepareAuthURL(path);
+            const authURL = prepareAuthURL(result.resource.clientId, path);
             await this.redirect(res, authURL);
         } else {
             await this.sendError(res, 401, 'Unathorized');
@@ -268,11 +282,11 @@ export class RequestProcessor {
     private async proxyRequest(req: IncomingMessage, res: ServerResponse, target: string, jwt: JWT) {
         $log.info('Proxy request to:', target);
 
-        let headers: { [name: string]: string } = {
+        const headers: { [name: string]: string } = {
             'X-Auth-Token': jwt.token,
             'X-Auth-Roles': jwt.getAllRoles().join(','),
-            'X-Auth-Username': jwt.content.preferred_username,
-            'X-Auth-Email': jwt.content.email,
+            'X-Auth-Username': jwt.payload.preferred_username,
+            'X-Auth-Email': jwt.payload.email,
         };
 
         // add x- forward headers if original request missing them

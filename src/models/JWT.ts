@@ -5,7 +5,22 @@ export class JWT {
     realm!: string;
 
     header: any;
-    content: any;
+    payload: {
+        iss: string;
+        azp: string;
+        exp: number;
+        preferred_username?: string;
+        email?: string;
+        resource_access?: {
+            [clientId: string]: {
+                roles: string[];
+            };
+        };
+        realm_access?: {
+            roles: string[];
+        };
+        [key: string]: any;
+    };
     signature!: Buffer;
     signed!: string;
 
@@ -15,16 +30,18 @@ export class JWT {
         try {
             const parts = token.split('.');
             this.header = JSON.parse(Buffer.from(parts[0], 'base64').toString());
-            this.content = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+            this.payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
 
-            if (this.content.iss && this.content.iss.indexOf('/auth/realms/') > 0) {
-                this.realm = this.content.iss.split('/auth/realms/')[1];
+            if (this.payload.iss && this.payload.iss.indexOf('/auth/realms/') > 0) {
+                this.realm = this.payload.iss.split('/auth/realms/')[1];
             }
 
             this.signature = Buffer.from(parts[2], 'base64');
             this.signed = parts[0] + '.' + parts[1];
         } catch (err) {
-            this.content = {
+            this.payload = {
+                iss: '',
+                azp: '',
                 exp: 0,
             };
         }
@@ -34,7 +51,7 @@ export class JWT {
      * @return {boolean}
      */
     isExpired(): boolean {
-        return this.content.exp * 1000 < Date.now();
+        return this.payload.exp * 1000 < Date.now();
     }
 
     /**
@@ -76,18 +93,18 @@ export class JWT {
     getAllRoles(): string[] {
         const result: string[] = [];
 
-        if (this.content.resource_access) {
-            for (const clientId of Object.keys(this.content.resource_access)) {
-                if (this.content.resource_access[clientId].roles) {
-                    for (const role of this.content.resource_access[clientId].roles) {
+        if (this.payload.resource_access) {
+            for (const clientId of Object.keys(this.payload.resource_access)) {
+                if (this.payload.resource_access[clientId].roles) {
+                    for (const role of this.payload.resource_access[clientId].roles) {
                         result.push(clientId + ':' + role);
                     }
                 }
             }
         }
 
-        if (this.content.realm_access && this.content.realm_access.roles) {
-            result.push(...this.content.realm_access.roles);
+        if (this.payload.realm_access && this.payload.realm_access.roles) {
+            result.push(...this.payload.realm_access.roles);
         }
 
         return result;
@@ -113,7 +130,7 @@ export class JWT {
      * Check if JWT has client role
      */
     private hasClientRole(clientId: string, roleName: string): boolean {
-        const appRoles = this.content.resource_access[clientId];
+        const appRoles = this.payload.resource_access[clientId];
 
         if (!appRoles) {
             return false;
@@ -126,10 +143,10 @@ export class JWT {
      * Check if JWT has realm role
      */
     private hasRealmRole(roleName: string): boolean {
-        if (!this.content.realm_access || !this.content.realm_access.roles) {
+        if (!this.payload.realm_access || !this.payload.realm_access.roles) {
             return false;
         }
 
-        return this.content.realm_access.roles.indexOf(roleName) >= 0;
+        return this.payload.realm_access.roles.indexOf(roleName) >= 0;
     }
 }

@@ -7,8 +7,8 @@ log:
   level: debug
 
 keycloak:
-  clientId: test
-  clientSecret: 9067b642-015a-441a-816b-0c8d19305d10
+  clients:
+    test: 9067b642-015a-441a-816b-0c8d19305d10
   realmURL:
     public: http://keycloak:8080/auth/realms/local
     private: http://keycloak:8080/auth/realms/local
@@ -36,6 +36,7 @@ cookie:
 # a collection of resource i.e. urls that you wish to protect
 resources:
   - match: /sso/.*
+    clientId: test
     ssoFlow: true
 
   - match: /api

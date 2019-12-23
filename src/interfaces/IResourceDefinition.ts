@@ -1,6 +1,7 @@
 export interface IResourceDefinition {
     match: string;
-    matchPattern: RegExp;
+    matchPattern?: RegExp;
+    clientId?: string;
     override?: string;
     whitelisted?: boolean;
     methods?: string[];
@@ -8,5 +9,5 @@ export interface IResourceDefinition {
         any?: string[];
         all?: string[];
     };
-    ssoFlow: boolean;
+    ssoFlow?: boolean;
 }

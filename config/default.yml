@@ -6,8 +6,8 @@ log:
   level: info
 
 keycloak:
-  clientId: <CLIENT_ID>
-  clientSecret: <CLIENT_SECRET>
+  clients:
+    <CLIENT_ID>: <CLIENT_SECRET>
   realmURL:
     public: https://keycloak.example.com/auth/realms/<REALM_NAME>
     private: https://keycloak.example.com/auth/realms/<REALM_NAME>

@@ -13,8 +13,7 @@ const logoutRedirectURL: string = get('logoutRedirectURL');
 const scopes: string[] = get('keycloak.scopes') || [];
 const publicRealmURL: string = get('keycloak.realmURL.public');
 const privateRealmURL: string = get('keycloak.realmURL.private');
-const clientId: string = get('keycloak.clientId');
-const clientSecret: string = get('keycloak.clientSecret');
+const clients: { [clientId: string]: string } = get('keycloak.clients');
 
 const request = axios.create({
     baseURL: privateRealmURL,
@@ -24,10 +23,16 @@ const certCache: { [kid: string]: string } = {};
 
 /**
  * Prepare Auth URL
+ * @param clientId
  * @param path
  */
-const prepareAuthURL = (path: string): string => {
-    const redirectUri = [host, callbackPath, `?src=${encodeURIComponent(path)}`].join('');
+const prepareAuthURL = (clientId: string, path: string): string => {
+    const redirectUri = [
+        host,
+        callbackPath,
+        `?src=${encodeURIComponent(path)}`,
+        `&clientId=${encodeURIComponent(clientId)}`,
+    ].join('');
 
     const scope = ['openid', 'email', 'profile', ...scopes].join(' ');
 
@@ -46,13 +51,15 @@ const prepareAuthURL = (path: string): string => {
  * @param refreshToken
  */
 const refresh = async (refreshToken: string): Promise<ITokenResponse> => {
+    const clientId: string = new JWT(refreshToken).payload.azp;
+
     const result = await request('/protocol/openid-connect/token', {
         method: 'POST',
         data: stringify({
             grant_type: 'refresh_token',
             refresh_token: refreshToken,
             client_id: clientId,
-            client_secret: clientSecret,
+            client_secret: clients[clientId],
         }),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -68,12 +75,14 @@ const refresh = async (refreshToken: string): Promise<ITokenResponse> => {
  * @param refreshToken
  */
 const logout = async (accessToken: string, refreshToken: string): Promise<void> => {
+    const clientId: string = new JWT(accessToken).payload.azp;
+
     await request('/protocol/openid-connect/logout', {
         method: 'POST',
         data: stringify({
             refresh_token: refreshToken,
             client_id: clientId,
-            client_secret: clientSecret,
+            client_secret: clients[clientId],
         }),
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -101,15 +110,21 @@ const preparePostLogoutURL = (): string => {
 const handleCallbackRequest = async (url: string): Promise<ITokenResponse> => {
     const queryString = url.substring(url.indexOf('?') + 1);
     const query = parse(queryString);
+    const clientId = query.clientId.toString();
 
-    const redirectUri = [host, callbackPath, `?src=${encodeURIComponent(query.src.toString())}`].join('');
+    const redirectUri = [
+        host,
+        callbackPath,
+        `?src=${encodeURIComponent(query.src.toString())}`,
+        `&clientId=${encodeURIComponent(clientId)}`,
+    ].join('');
 
     const result = await request('/protocol/openid-connect/token', {
         method: 'POST',
         data: stringify({
             code: query.code,
             client_id: clientId,
-            client_secret: clientSecret,
+            client_secret: clients[clientId],
             grant_type: 'authorization_code',
             redirect_uri: redirectUri,
         }),
@@ -209,12 +224,4 @@ const verifyOnline = async (accessToken: string): Promise<JWT | null> => {
     return jwtToken;
 };
 
-export {
-    refresh,
-    logout,
-    prepareAuthURL,
-    preparePostLogoutURL,
-    verifyOffline,
-    verifyOnline,
-    handleCallbackRequest,
-};
+export { refresh, logout, prepareAuthURL, preparePostLogoutURL, verifyOffline, verifyOnline, handleCallbackRequest };

@@ -3,7 +3,7 @@ export interface IResourceDefinition {
     matchPattern?: RegExp;
     clientId?: string;
     override?: string;
-    whitelisted?: boolean;
+    public?: boolean;
     methods?: string[];
     roles?: {
         any?: string[];

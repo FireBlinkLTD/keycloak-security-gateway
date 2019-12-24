@@ -42,6 +42,8 @@ resources:
 
   - match: /api
   - match: /
+  - match: /public
+    public: true
 
   - match: /api/roles/all
     roles:

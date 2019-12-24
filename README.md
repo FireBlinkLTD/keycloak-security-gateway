@@ -16,6 +16,7 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 | Specify custom Cookie names                                                           | Yes                                 | No                                                                    |
 | JWT online verification stratagy                                                      | Yes                                 | No                                                                    |
 | Flexible role based access (like: at least one of the roles required, not simply all) | Yes                                 | Yes (either all or at least one, but not both rules at the same time) |
+| Multiple KC clients supported                                                         | Yes                                 | No                                                                    |
 
 ## Configuration
 
@@ -33,7 +34,7 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 - `APP_KEYCLOAK_SCOPES` - Additional client scopes in JSON string, e.g. `["address","phone"]`
 
 - `APP_UPSTREAM_URL` - Upstream URL to forward requests to
-- `APP_LOGOUT_REDIRECT_URL` - URL or relative path to redirect user after logout
+- `APP_LOGOUT_REDIRECT_URL` - URL or relative path to redirect user after logout. User can provide a query parameter `redirectTo` to override this setting on per request level.
 
 - `APP_PATHS_CALLBACK` - Routing path to use for SSO authentication callback, e.g. `/oauth/callback`
 - `APP_PATHS_LOGOUT` - Logout path to use, e.g. `/logout`
@@ -58,6 +59,10 @@ match: /a/(.*)
 # If not - 401 will be simply returned and it is up to frontend application to reload page
 ssoFlow: false
 
+# [optional] if ssoFlow is enabled this field is mandatory
+# Identifies what client_id to use for SSO authentication flow
+clientId: test-client
+
 # [optional] list of HTTP methods to match, note: if not provided application will match all methods
 methods:
   - GET
@@ -65,6 +70,9 @@ methods:
 
 # [optional] override path before making a proxy call to upstream server
 override: /b/$1
+
+# [optional] skip JWT verification and allow public access to the resource
+public: false
 
 # [optional] roles to verify the JWT with
 roles:
@@ -83,10 +91,10 @@ roles:
 
 Gatekeeper can validate JWT for each request in 2 different ways:
 
-### Offline validation
+### Offline Verification
 
 Most common scenario to use. Fast, but if session get revoked on Keycloak side user will still be able to use application till token will not expire.
 
-### Online validation
+### Online Verification
 
 Slow, as every request will be verified with Keycloak, however guarantees that if session get revoked - user will not have access to application any longer.

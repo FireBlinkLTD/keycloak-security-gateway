@@ -123,7 +123,16 @@ class SSOFlow {
 
         // logout
         console.log('-> Open /logout page');
-        await page.goto(get('host') + '/logout', {
+        await page.goto(get('host') + '/logout?redirectTo=/public', {
+            waitUntil: 'networkidle0',
+        });
+
+        body = await page.evaluate(() => document.querySelector('pre').innerHTML);
+        deepStrictEqual(JSON.parse(body), { success: true });
+
+        // Go to root
+        console.log('-> Open /');
+        await page.goto(get('host') + '/', {
             waitUntil: 'networkidle0',
         });
 

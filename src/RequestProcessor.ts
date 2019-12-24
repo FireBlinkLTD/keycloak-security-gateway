@@ -6,6 +6,8 @@ import { JWT } from './models/JWT';
 import { parse as cookieParse, serialize } from 'cookie';
 import { $log } from 'ts-log-debug';
 import * as ejs from 'ejs';
+import { parse as queryParse } from 'querystring';
+
 import {
     logout,
     prepareAuthURL,
@@ -157,7 +159,17 @@ export class RequestProcessor {
             }),
         ]);
 
-        await this.redirect(res, preparePostLogoutURL());
+        let redirectURL: string;
+        if (req.url.indexOf('?')) {
+            const query = queryParse(req.url.substring(req.url.indexOf('?') + 1));
+            redirectURL = query.redirectTo && query.redirectTo.toString();
+        }
+
+        if (!redirectURL) {
+            redirectURL = preparePostLogoutURL();
+        }
+
+        await this.redirect(res, redirectURL);
     }
 
     /**
@@ -279,15 +291,17 @@ export class RequestProcessor {
         return jwt;
     }
 
-    private async proxyRequest(req: IncomingMessage, res: ServerResponse, target: string, jwt: JWT) {
+    private async proxyRequest(req: IncomingMessage, res: ServerResponse, target: string, jwt: JWT | null) {
         $log.info('Proxy request to:', target);
 
-        const headers: { [name: string]: string } = {
-            'X-Auth-Token': jwt.token,
-            'X-Auth-Roles': jwt.getAllRoles().join(','),
-            'X-Auth-Username': jwt.payload.preferred_username,
-            'X-Auth-Email': jwt.payload.email,
-        };
+        const headers: { [name: string]: string } = {};
+
+        if (jwt) {
+            headers['X-Auth-Token'] = jwt.token;
+            headers['X-Auth-Roles'] = jwt.getAllRoles().join(',');
+            headers['X-Auth-Username'] = jwt.payload.preferred_username;
+            headers['X-Auth-Email'] = jwt.payload.email;
+        }
 
         // add x- forward headers if original request missing them
         const xfwd = !req.headers['x-forwarded-for'];
@@ -352,7 +366,7 @@ export class RequestProcessor {
         }
 
         let jwt;
-        if (!result.resource.whitelisted) {
+        if (!result.resource.public) {
             jwt = await this.handleVerificationFlow(req, res, path, result);
             if (!jwt) {
                 return;

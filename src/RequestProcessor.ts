@@ -79,6 +79,13 @@ export class RequestProcessor {
         await sendRedirect(res, response.redirectTo);
     }
 
+    /**
+     * Handle unathorized flow
+     * @param req
+     * @param res
+     * @param path
+     * @param result
+     */
     private async handleUnathorizedFlow(
         req: IncomingMessage,
         res: ServerResponse,
@@ -86,27 +93,28 @@ export class RequestProcessor {
         result: ITargetPathResult,
     ): Promise<string | null> {
         $log.debug('Handling unauthorized flow');
-        if (result.resource.ssoFlow) {
-            const refreshToken = extractRefreshToken(req);
 
-            if (refreshToken) {
-                const jwtToken = new JWT(refreshToken);
-                if (!jwtToken.isExpired()) {
-                    $log.debug('Found unexpired refresh token. Refreshing access one...');
-                    const refreshResponse = await refresh(refreshToken);
+        const refreshToken = extractRefreshToken(req);
 
-                    const accessToken = refreshResponse.access_token;
-                    const accessTokenExp = new Date(Date.now() + refreshResponse.expires_in * 1000 - 1000);
+        if (refreshToken) {
+            const jwtToken = new JWT(refreshToken);
+            if (!jwtToken.isExpired()) {
+                $log.debug('Found unexpired refresh token. Refreshing access one...');
+                const refreshResponse = await refresh(refreshToken);
 
-                    const newRefreshToken = refreshResponse.refresh_token;
-                    const refreshTokenExp = new Date(Date.now() + refreshResponse.refresh_expires_in * 1000 - 1000);
+                const accessToken = refreshResponse.access_token;
+                const accessTokenExp = new Date(Date.now() + refreshResponse.expires_in * 1000 - 1000);
 
-                    setAuthCookies(res, accessToken, accessTokenExp, newRefreshToken, refreshTokenExp);
+                const newRefreshToken = refreshResponse.refresh_token;
+                const refreshTokenExp = new Date(Date.now() + refreshResponse.refresh_expires_in * 1000 - 1000);
 
-                    return refreshResponse.access_token;
-                }
+                setAuthCookies(res, accessToken, accessTokenExp, newRefreshToken, refreshTokenExp);
+
+                return refreshResponse.access_token;
             }
+        }
 
+        if (result.resource.ssoFlow) {
             const authURL = prepareAuthURL(result.resource.clientId, path);
             await sendRedirect(res, authURL);
         } else {

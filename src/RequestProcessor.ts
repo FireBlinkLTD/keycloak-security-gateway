@@ -3,20 +3,15 @@ import { createProxyServer } from 'http-proxy';
 import { get } from 'config';
 import { IResourceDefinition, ITargetPathResult } from './interfaces';
 import { JWT } from './models/JWT';
-import { parse as cookieParse, serialize } from 'cookie';
 import { $log } from 'ts-log-debug';
 import * as ejs from 'ejs';
-import { parse as queryParse } from 'querystring';
+import { sendError, sendRedirect, setAuthCookies } from './utils/ResponseUtil';
+import { extractAccessToken, extractRefreshToken, extractRequestPath } from './utils/RequestUtil';
 
-import {
-    logout,
-    prepareAuthURL,
-    verifyOnline,
-    verifyOffline,
-    preparePostLogoutURL,
-    handleCallbackRequest,
-    refresh,
-} from './utils/KeycloakUtil';
+import handleHealthRoute from './routes/HealthRoute';
+import handleLogoutRoute from './routes/LogoutRoute';
+
+import { prepareAuthURL, verifyOnline, verifyOffline, handleCallbackRequest, refresh } from './utils/KeycloakUtil';
 
 export class RequestProcessor {
     private proxy = createProxyServer();
@@ -24,9 +19,6 @@ export class RequestProcessor {
     private callbackPath: string = get('paths.callback');
     private logoutPath: string = get('paths.logout');
     private healthPath: string = get('paths.health');
-    private cookieAccessToken: string = get('cookie.accessToken');
-    private cookieRefreshToken: string = get('cookie.refreshToken');
-    private secureCookies: boolean = get('cookie.secure') === '1';
     private resources: IResourceDefinition[] = JSON.parse(JSON.stringify(get('resources')));
     private jwtVerificationOnline = get('jwtVerification') === 'ONLINE';
     private additionalHeaders: { [name: string]: string } = get('headers');
@@ -70,133 +62,21 @@ export class RequestProcessor {
     }
 
     /**
-     * Send error response
-     * @param res
-     * @param statusCode
-     * @param description
-     */
-    private async sendError(res: ServerResponse, statusCode: number, description: string) {
-        $log.warn('Sending error response:', statusCode, description);
-        res.statusCode = statusCode;
-
-        await new Promise((resolve, reject) => {
-            res.write(description, err => {
-                if (err) {
-                    $log.warn('Unable to write response', err);
-
-                    return reject(err);
-                }
-
-                res.end(() => {
-                    resolve();
-                });
-            });
-        });
-    }
-
-    /**
-     * Send redirect response
-     * @param res
-     * @param url
-     * @param statusCode
-     */
-    private async redirect(res: ServerResponse, url: string, statusCode = 307) {
-        $log.debug('Redirecting to:', url);
-        res.statusCode = statusCode;
-        res.setHeader('Location', url);
-        await new Promise(resolve => res.end(resolve));
-    }
-
-    /**
      * Handle authorization callback request
      */
     private async handleCallback(req: IncomingMessage, res: ServerResponse) {
         $log.debug('Handling oauth callback request', req.url);
         const response = await handleCallbackRequest(req.url);
-        res.setHeader('Set-Cookie', [
-            serialize(this.cookieAccessToken, response.access_token, {
-                expires: new Date(Date.now() + response.expires_in * 1000 - 1000),
-                secure: this.secureCookies,
-                path: '/',
-            }),
 
-            serialize(this.cookieRefreshToken, response.refresh_token, {
-                expires: new Date(Date.now() + response.refresh_expires_in * 1000 - 1000),
-                secure: this.secureCookies,
-                path: '/',
-            }),
-        ]);
+        const accessToken = response.access_token;
+        const accessTokenExp = new Date(Date.now() + response.expires_in * 1000 - 1000);
 
-        await this.redirect(res, response.redirectTo);
-    }
+        const refreshToken = response.refresh_token;
+        const refreshTokenExp = new Date(Date.now() + response.refresh_expires_in * 1000 - 1000);
 
-    /**
-     * Handle logout request
-     * @param req
-     * @param res
-     */
-    private async handleLogout(req: IncomingMessage, res: ServerResponse) {
-        $log.debug('Handling logout request');
-        const accessToken = this.getAccessToken(req);
-        const refreshToken = this.getRefreshToken(req);
+        setAuthCookies(res, accessToken, accessTokenExp, refreshToken, refreshTokenExp);
 
-        if (accessToken && refreshToken) {
-            await logout(accessToken, refreshToken);
-        }
-
-        const expires = new Date(0);
-        res.setHeader('Set-Cookie', [
-            serialize(this.cookieAccessToken, 'deleted', {
-                expires,
-                secure: this.secureCookies,
-                path: '/',
-            }),
-
-            serialize(this.cookieRefreshToken, 'deleted', {
-                expires,
-                secure: this.secureCookies,
-                path: '/',
-            }),
-        ]);
-
-        let redirectURL: string;
-        if (req.url.indexOf('?')) {
-            const query = queryParse(req.url.substring(req.url.indexOf('?') + 1));
-            redirectURL = query.redirectTo && query.redirectTo.toString();
-        }
-
-        if (!redirectURL) {
-            redirectURL = preparePostLogoutURL();
-        }
-
-        await this.redirect(res, redirectURL);
-    }
-
-    /**
-     * Handle health request
-     * @param res
-     */
-    private async handleHealth(res: ServerResponse) {
-        res.statusCode = 200;
-
-        await new Promise((resolve, reject) => {
-            res.write(
-                JSON.stringify({
-                    ready: true,
-                }),
-                err => {
-                    if (err) {
-                        $log.warn('Unable to write response', err);
-
-                        return reject(err);
-                    }
-
-                    res.end(() => {
-                        resolve();
-                    });
-                },
-            );
-        });
+        await sendRedirect(res, response.redirectTo);
     }
 
     private async handleUnathorizedFlow(
@@ -207,7 +87,7 @@ export class RequestProcessor {
     ): Promise<string | null> {
         $log.debug('Handling unauthorized flow');
         if (result.resource.ssoFlow) {
-            const refreshToken = this.getRefreshToken(req);
+            const refreshToken = extractRefreshToken(req);
 
             if (refreshToken) {
                 const jwtToken = new JWT(refreshToken);
@@ -215,22 +95,22 @@ export class RequestProcessor {
                     $log.debug('Found unexpired refresh token. Refreshing access one...');
                     const refreshResponse = await refresh(refreshToken);
 
-                    res.setHeader('Set-Cookie', [
-                        serialize(this.cookieAccessToken, refreshResponse.access_token, {
-                            expires: new Date(Date.now() + refreshResponse.expires_in * 1000 - 1000),
-                            secure: this.secureCookies,
-                            path: '/',
-                        }),
-                    ]);
+                    const accessToken = refreshResponse.access_token;
+                    const accessTokenExp = new Date(Date.now() + refreshResponse.expires_in * 1000 - 1000);
+
+                    const newRefreshToken = refreshResponse.refresh_token;
+                    const refreshTokenExp = new Date(Date.now() + refreshResponse.refresh_expires_in * 1000 - 1000);
+
+                    setAuthCookies(res, accessToken, accessTokenExp, newRefreshToken, refreshTokenExp);
 
                     return refreshResponse.access_token;
                 }
             }
 
             const authURL = prepareAuthURL(result.resource.clientId, path);
-            await this.redirect(res, authURL);
+            await sendRedirect(res, authURL);
         } else {
-            await this.sendError(res, 401, 'Unathorized');
+            await sendError(res, 401, 'Unathorized');
         }
 
         return null;
@@ -249,7 +129,7 @@ export class RequestProcessor {
         path: string,
         result: ITargetPathResult,
     ): Promise<JWT | null> {
-        let token = this.getAccessToken(req);
+        let token = extractAccessToken(req);
         let jwt: JWT;
 
         if (!token) {
@@ -280,7 +160,7 @@ export class RequestProcessor {
 
         if (result.resource.roles) {
             if (!jwt.verifyRoles(result.resource.roles)) {
-                await this.sendError(res, 403, 'Forbidden');
+                await sendError(res, 403, 'Forbidden');
 
                 return null;
             }
@@ -336,7 +216,7 @@ export class RequestProcessor {
     }
 
     private async handleRequest(req: IncomingMessage, res: ServerResponse) {
-        const path = this.extractPath(req);
+        const path = extractRequestPath(req);
         $log.info(`New request received. method: ${req.method}; path: ${path}`);
 
         if (path === this.callbackPath) {
@@ -346,13 +226,13 @@ export class RequestProcessor {
         }
 
         if (path === this.logoutPath) {
-            await this.handleLogout(req, res);
+            await handleLogoutRoute(req, res);
 
             return;
         }
 
         if (path === this.healthPath) {
-            await this.handleHealth(res);
+            await handleHealthRoute(res);
 
             return;
         }
@@ -360,7 +240,7 @@ export class RequestProcessor {
         const result = this.findTargetPath(req, path);
 
         if (!result) {
-            await this.sendError(res, 404, 'Not found');
+            await sendError(res, 404, 'Not found');
 
             return;
         }
@@ -390,56 +270,8 @@ export class RequestProcessor {
     process(req: IncomingMessage, res: ServerResponse) {
         this.handleRequest(req, res).catch(err => {
             $log.error('Unexpected error occurred', err);
-            this.sendError(res, 500, 'Unexpected error');
+            sendError(res, 500, 'Unexpected error');
         });
-    }
-
-    /**
-     * Extract JWT token string from Authorization header or Cookie
-     * @param req
-     */
-    private getAccessToken(req: IncomingMessage): string | null {
-        $log.debug('Trying to extract JWT from request');
-        let token: string | null = null;
-
-        if (req.headers.authorization && req.headers.authorization.toLowerCase().indexOf('bearer ') === 0) {
-            token = req.headers.authorization.substring(7); // 'Bearer '.length
-        }
-
-        if (!token && req.headers.cookie) {
-            if (req.headers.cookie.indexOf(this.cookieAccessToken) >= 0) {
-                const cookies = cookieParse(req.headers.cookie);
-                token = cookies[this.cookieAccessToken];
-            }
-        }
-
-        $log.debug('Access Token:', token);
-
-        return token;
-    }
-
-    /**
-     * Extract JWT token string from Authorization header or Cookie
-     * @param req
-     */
-    private getRefreshToken(req: IncomingMessage): string | null {
-        $log.debug('Trying to extract refresh token from request');
-        let token: string | null = null;
-        if (req.headers.cookie && req.headers.cookie.indexOf(this.cookieRefreshToken) >= 0) {
-            const cookies = cookieParse(req.headers.cookie);
-            token = cookies[this.cookieRefreshToken];
-        }
-        $log.debug('Refresh Token:', token);
-
-        return token;
-    }
-
-    /**
-     * Extract path string from incomming request
-     * @param req
-     */
-    private extractPath(req: IncomingMessage): string {
-        return req.url.split('?')[0];
     }
 
     /**

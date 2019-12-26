@@ -28,7 +28,6 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 - `APP_LOG_LEVEL` - Log level, `debug`, `info`, `error`
 
 - `APP_KEYCLOAK_CLIENTS` - JSON formatter Keycloak client=secret mapping, e.g. `{"test":"9067b642-015a-441a-816b-0c8d19305d10"}`
-- `APP_KEYCLOAK_CLIENT_SECRET` - Keycloak's client secret
 - `APP_KEYCLOAK_PUBLIC_REALM_URL` - Keycloak's realm URL (public facing, used for SSO redirects), e.g: `https://keycloak.example.com/auth/realms/master`
 - `APP_KEYCLOAK_PRIVATE_REALM_URL` - Keycloak's realm URL (local DNS, used for API integration), e.g: `http://keycloak.default.svc.cluster.local:8080/auth/realms/master`
 - `APP_KEYCLOAK_SCOPES` - Additional client scopes in JSON string, e.g. `["address","phone"]`

@@ -3,7 +3,7 @@ import { IClientConfiguration } from './IClientConfiguration';
 export interface IResourceDefinition {
     match: string;
     matchPattern?: RegExp;
-    clientId?: string;
+    clientSID?: string;
     clientConfiguration?: IClientConfiguration;
     override?: string;
     public?: boolean;

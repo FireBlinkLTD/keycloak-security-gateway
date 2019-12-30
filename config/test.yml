@@ -8,7 +8,8 @@ log:
 
 keycloak:
   clients:
-    - clientId: test
+    - sid: test
+      clientId: test
       secret: 9067b642-015a-441a-816b-0c8d19305d10
       realmURL:
         public: http://keycloak:8080/auth/realms/local
@@ -38,7 +39,7 @@ cookie:
 resources:
   - match: \/sso\/([^\/]+)(\/.*)
     override: /sso$2
-    clientId: $1
+    clientSID: $1
     ssoFlow: true
 
   - match: /api

@@ -40,9 +40,9 @@ export class RequestProcessor {
 
         for (const resource of this.resources) {
             if (resource.ssoFlow) {
-                if (!resource.clientId) {
+                if (!resource.clientSID) {
                     throw new Error(
-                        `"clientId" is missing in resource definition that matches: "${resource.match}" and has ssoFlow enabled`,
+                        `"clientSID" is missing in resource definition that matches: "${resource.match}" and has ssoFlow enabled`,
                     );
                 }
             }
@@ -313,17 +313,17 @@ export class RequestProcessor {
                 },
             };
 
-            if (resource.clientId && resource.clientId[0] === '$') {
-                result.resource.clientId = match[Number(resource.clientId.substring(1))];
+            if (resource.clientSID && resource.clientSID[0] === '$') {
+                result.resource.clientSID = match[Number(resource.clientSID.substring(1))];
             }
 
-            if (result.resource.clientId) {
+            if (result.resource.clientSID) {
                 result.resource.clientConfiguration = this.clientConfigurations.find(
-                    c => c.clientId === result.resource.clientId,
+                    c => c.sid === result.resource.clientSID,
                 );
                 if (!result.resource.clientConfiguration) {
                     throw new Error(
-                        `Unable to find matching client configuration for clientId "${result.resource.clientId}" that matches: "${resource.match}" and has ssoFlow enabled`,
+                        `Unable to find matching client configuration for clientSID "${result.resource.clientSID}" that matches: "${resource.match}" and has ssoFlow enabled`,
                     );
                 }
             }

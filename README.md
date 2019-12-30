@@ -49,10 +49,21 @@ Node.js based proxy service to secure applications and integrate with Keycloak S
 ### Client Configuration
 
 ```yaml
+# [required] Secondary identify, should be unique across all client configurations, used to match inside resource definitions
+sid: master-test
+
+# [required] Keycloak's Client "client_id" value
 clientId: test
+
+# [required] Keycloak's Client "client_secret" value
 secret: 9067b642-015a-441a-816b-0c8d19305d10
+
+# [required] Keycloak Realm URLs
 realmURL:
+  # [required] Public facing URL (used to redirect client in SSO flow)
   public: https://keycloak.example.com/auth/realms/master
+
+  # [required] Private URL (used for API integration)
   private: http://keycloak.local:8080/auth/realms/master
 ```
 
@@ -68,8 +79,8 @@ match: /a/(.*)
 ssoFlow: false
 
 # [optional] if ssoFlow is enabled this field is mandatory
-# Identifies what client_id to use for SSO authentication flow
-clientId: test-client
+# Identifies what client configuration to use for SSO authentication flow (should match "sid" field)
+clientSID: test-client
 
 # [optional] list of HTTP methods to match, note: if not provided application will match all methods
 methods:

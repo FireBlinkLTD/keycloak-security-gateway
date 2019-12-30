@@ -5,7 +5,8 @@ import { createServer, Server, IncomingHttpHeaders } from 'http';
 import axios from 'axios';
 import { deepStrictEqual, strictEqual } from 'assert';
 import { stringify } from 'querystring';
-const clients: { [clientId: string]: string } = get('keycloak.clients');
+import { IClientConfiguration } from '../../src/interfaces/IClientConfiguration';
+const clients: IClientConfiguration[] = get('keycloak.clients');
 
 @suite()
 class APIFlow {
@@ -65,7 +66,7 @@ class APIFlow {
     private async getAccessToken(): Promise<string> {
         console.log('-> Retrieving access_token from KC...');
         const request = axios.create({
-            baseURL: get('keycloak.realmURL.private'),
+            baseURL: clients[0].realmURL.private,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
@@ -76,7 +77,7 @@ class APIFlow {
             data: stringify({
                 grant_type: 'client_credentials',
                 client_id: 'test',
-                client_secret: clients.test,
+                client_secret: clients[0].secret,
             }),
         });
 

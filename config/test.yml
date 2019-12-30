@@ -8,10 +8,11 @@ log:
 
 keycloak:
   clients:
-    test: 9067b642-015a-441a-816b-0c8d19305d10
-  realmURL:
-    public: http://keycloak:8080/auth/realms/local
-    private: http://keycloak:8080/auth/realms/local
+    - clientId: test
+      secret: 9067b642-015a-441a-816b-0c8d19305d10
+      realmURL:
+        public: http://keycloak:8080/auth/realms/local
+        private: http://keycloak:8080/auth/realms/local
 
 # the upstream endpoint which we should proxy request
 upstreamURL: http://localhost:7777

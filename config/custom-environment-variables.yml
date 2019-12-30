@@ -10,9 +10,6 @@ keycloak:
   clients:
     __name: APP_KEYCLOAK_CLIENTS
     __format: json
-  realmURL:
-    public: APP_KEYCLOAK_PUBLIC_REALM_URL
-    private: APP_KEYCLOAK_PRIVATE_REALM_URL
 
   scopes:
     __name: APP_KEYCLOAK_SCOPES

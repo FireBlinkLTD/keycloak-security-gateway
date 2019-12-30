@@ -12,6 +12,7 @@ import handleHealthRoute from './routes/HealthRoute';
 import handleLogoutRoute from './routes/LogoutRoute';
 
 import { prepareAuthURL, verifyOnline, verifyOffline, handleCallbackRequest, refresh } from './utils/KeycloakUtil';
+import { IClientConfiguration } from './interfaces/IClientConfiguration';
 
 export class RequestProcessor {
     private proxy = createProxyServer();
@@ -20,6 +21,7 @@ export class RequestProcessor {
     private logoutPath: string = get('paths.logout');
     private healthPath: string = get('paths.health');
     private resources: IResourceDefinition[] = JSON.parse(JSON.stringify(get('resources')));
+    private clientConfigurations: IClientConfiguration[] = get('keycloak.clients');
     private jwtVerificationOnline = get('jwtVerification') === 'ONLINE';
     private additionalHeaders: { [name: string]: string } = get('headers');
 
@@ -37,10 +39,12 @@ export class RequestProcessor {
         }
 
         for (const resource of this.resources) {
-            if (resource.ssoFlow && !resource.clientId) {
-                throw new Error(
-                    `"clientId" is missing in resource definition that matches: "${resource.match}" and has ssoFlow enabled`,
-                );
+            if (resource.ssoFlow) {
+                if (!resource.clientId) {
+                    throw new Error(
+                        `"clientId" is missing in resource definition that matches: "${resource.match}" and has ssoFlow enabled`,
+                    );
+                }
             }
 
             let match = resource.match;
@@ -115,7 +119,7 @@ export class RequestProcessor {
         }
 
         if (result.resource.ssoFlow) {
-            const authURL = prepareAuthURL(result.resource.clientId, path);
+            const authURL = prepareAuthURL(result.resource.clientConfiguration, path);
             await sendRedirect(res, authURL);
         } else {
             await sendError(res, 401, 'Unathorized');
@@ -311,6 +315,17 @@ export class RequestProcessor {
 
             if (resource.clientId && resource.clientId[0] === '$') {
                 result.resource.clientId = match[Number(resource.clientId.substring(1))];
+            }
+
+            if (result.resource.clientId) {
+                result.resource.clientConfiguration = this.clientConfigurations.find(
+                    c => c.clientId === result.resource.clientId,
+                );
+                if (!result.resource.clientConfiguration) {
+                    throw new Error(
+                        `Unable to find matching client configuration for clientId "${result.resource.clientId}" that matches: "${resource.match}" and has ssoFlow enabled`,
+                    );
+                }
             }
 
             if (resource.override) {

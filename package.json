@@ -31,7 +31,7 @@
     "ts-log-debug": "5.1.1"
   },
   "devDependencies": {
-    "@commitlint/cli": "8.2.0",
+    "@commitlint/cli": "8.3.4",
     "@commitlint/config-conventional": "8.2.0",
     "@types/chai": "4.2.7",
     "@types/config": "0.0.36",

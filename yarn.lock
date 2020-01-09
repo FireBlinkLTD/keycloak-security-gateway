@@ -365,10 +365,10 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/http-proxy@1.17.2":
-  version "1.17.2"
-  resolved "https://registry.yarnpkg.com/@types/http-proxy/-/http-proxy-1.17.2.tgz#3b7fb5365a00d47129967b0b2da51c2123692314"
-  integrity sha512-Qfb7batJJBlI8wcrd48vHpgsOOYzQQa+OZcaIz33jkJPe8A7KktAJFmRAiR42s5BfnErdlFnOyQucq2BKy/98g==
+"@types/http-proxy@1.17.3":
+  version "1.17.3"
+  resolved "https://registry.yarnpkg.com/@types/http-proxy/-/http-proxy-1.17.3.tgz#348e1b808ff9585423cb909e9992d89ccdbf4c14"
+  integrity sha512-wIPqXANye5BbORbuh74exbwNzj+UWCwWyeEFJzUQ7Fq3W2NSAy+7x7nX1fgbEypr2/TdKqpeuxLnXWgzN533/Q==
   dependencies:
     "@types/node" "*"
 

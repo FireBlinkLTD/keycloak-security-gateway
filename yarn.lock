@@ -292,10 +292,10 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@tsed/logger@5.1.2":
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/@tsed/logger/-/logger-5.1.2.tgz#ec1cdc5fa67b484e5e9416ffbab610e8148a3796"
-  integrity sha512-qWROFge1tq86tnHb88pduSCaQvEyPTLBBnM3GBNTxVPm3/ymHp3TIVFVYsgmDedYDPtItrcXXt3q/RASkdXY9Q==
+"@tsed/logger@5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@tsed/logger/-/logger-5.2.0.tgz#cf74c880f1e011f1f011fb33db9f25d89637a2d0"
+  integrity sha512-fn90wAvV7ZDZZZefeNuR4oNJh0CXKx1IDD0P6dOm+LnDzG/CJ68qKsVthAdy9WFpkrZHxsSvOgovW8XLiKKKUA==
   dependencies:
     colors "^1.3.3"
     date-format "^2.0.0"
@@ -5049,12 +5049,12 @@ trim-off-newlines@^1.0.0:
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
   integrity sha1-n5up2e+odkw4dpi8v+sshI8RrbM=
 
-ts-log-debug@5.1.2:
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/ts-log-debug/-/ts-log-debug-5.1.2.tgz#021a7ffb3afad16d857f6b4caa45fe80627bb97c"
-  integrity sha512-7QJoBqwvpRyM/LSEyq73lJBPoPElLmWtP3hdpEfoi3Uxwu2EAdA8dnYSc6zmq71wj1+2nouFLe5pPISZhaznIw==
+ts-log-debug@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/ts-log-debug/-/ts-log-debug-5.2.0.tgz#c25678ea5efdefb9f5e6bbf780add44b6a9070af"
+  integrity sha512-O1UKfFTQVvwgTeGXMQA0GqKYveXSUe45eY8cUYDhspXg96266OksKNSl873NUSuD/fajSFN9b0HIWZlDHhnzAA==
   dependencies:
-    "@tsed/logger" "5.1.2"
+    "@tsed/logger" "5.2.0"
 
 ts-node@8.6.2:
   version "8.6.2"

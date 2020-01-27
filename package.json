@@ -28,7 +28,7 @@
     "http-proxy": "1.18.0",
     "js-yaml": "3.13.1",
     "jsonwebtoken": "8.5.1",
-    "ts-log-debug": "5.2.0"
+    "ts-log-debug": "5.2.1"
   },
   "devDependencies": {
     "@commitlint/cli": "8.3.5",

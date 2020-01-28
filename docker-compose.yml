@@ -2,30 +2,29 @@ version: '3'
 
 services:
   app:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile-test
     environment:
-      NODE_ENV: test      
+      NODE_ENV: test
     ports:
       - 8888:8888
     volumes:
       - './coverage:/app/coverage'
       - './mochawesome-report:/app/mochawesome-report'
-      - './.nyc_output:/app/.nyc_output'
       - './report:/app/report'
     depends_on:
-      - keycloak    
-    
+      - keycloak
+
   # --------------- #
   #     KEYCLOAK    #
-  # --------------- #  
+  # --------------- #
   keycloak:
     image: jboss/keycloak:6.0.1
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
-      DB_VENDOR: h2 
+      DB_VENDOR: h2
       KEYCLOAK_LOGLEVEL: debug
     ports:
       - 8080:8080

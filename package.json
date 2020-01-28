@@ -1,6 +1,6 @@
 {
   "name": "@fireblink/keycloak-security-gateway",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Node.js based proxy service to secure applications and integrate with Keycloak SSO flow.",
   "keywords": [],
   "engines": {

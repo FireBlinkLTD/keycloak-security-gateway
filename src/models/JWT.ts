@@ -130,6 +130,10 @@ export class JWT {
      * Check if JWT has client role
      */
     private hasClientRole(clientId: string, roleName: string): boolean {
+        if (!this.payload.resource_access) {
+            return false;
+        }
+
         const appRoles = this.payload.resource_access[clientId];
 
         if (!appRoles) {

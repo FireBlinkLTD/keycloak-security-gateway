@@ -5,16 +5,16 @@
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/FireBlinkLTD/keycloak-security-gateway.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FireBlinkLTD/keycloak-security-gateway/context:javascript)
 [![Greenkeeper badge](https://badges.greenkeeper.io/FireBlinkLTD/keycloak-security-gateway.svg)](https://greenkeeper.io/)
 
-Node.js based proxy service to secure applications and integrate with Keycloak SSO flow with extra cool benefits:
+Node.js based proxy service to secure applications and integrate with the Keycloak SSO flow with extra benefits comparing to Keycloak's Gatekeeper:
 
 | Feature                                                                               | fireblink/keycloak-security-gateway | keycloak/keycloak-gatekeeper                                          |
 | ------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------- |
-| Ability to use internal to cluster Keycloak address for API integration               | Yes                                 | No                                                                    |
-| Use SSO flow for UI endpoints only                                                    | Yes                                 | No                                                                    |
-| Redirect to custom address upon logout                                                | Yes                                 | No                                                                    |
-| Ability to specify target interface to listen incomming connections                   | Yes                                 | No                                                                    |
-| Specify custom Cookie names                                                           | Yes                                 | No                                                                    |
-| JWT online verification stratagy                                                      | Yes                                 | No                                                                    |
+| Ability to use internal to the cluster Keycloak address for API integration           | Yes                                 | No                                                                    |
+| Use SSO flow for the UI endpoints only                                                | Yes                                 | No                                                                    |
+| Redirect to the custom address upon logout                                            | Yes                                 | No                                                                    |
+| Ability to specify the target interface to listen incomming connections               | Yes                                 | No                                                                    |
+| Ability to specify custom Cookie names                                                | Yes                                 | No                                                                    |
+| JWT online verification strategy                                                      | Yes                                 | No                                                                    |
 | Flexible role based access (like: at least one of the roles required, not simply all) | Yes                                 | Yes (either all or at least one, but not both rules at the same time) |
 | Multiple KC clients supported                                                         | Yes                                 | No                                                                    |
 
@@ -117,3 +117,9 @@ Most common scenario to use. Fast, but if session get revoked on Keycloak side u
 ### Online Verification
 
 Slow, as every request will be verified with Keycloak, however guarantees that if session get revoked - user will not have access to application any longer.
+
+## Troubleshooting
+
+### User has role, but still could not access resource.
+
+Make sure client has all the necessary roles included in the scope, or "Full Scope Allowed" toggle is turned on.

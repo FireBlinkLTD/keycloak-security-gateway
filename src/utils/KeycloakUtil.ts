@@ -218,8 +218,12 @@ const getPublicCert = async (clientConfiguration: IClientConfiguration, jwtToken
     const key = certs.keys.find((k: any) => k.kid === jwtToken.header.kid);
 
     // validate
-    if (!key || !key.n || !key.e || key.kty !== 'RSA' || key.alg !== 'RS256') {
-        throw new Error('Missing or invalid key format.');
+    if (!key) {
+        throw new Error(`Unable to retrieve public certificate for key: ${jwtToken.header.kid}`);
+    }
+
+    if (!key.n || !key.e || key.kty !== 'RSA' || key.alg !== 'RS256') {
+        throw new Error('Cerfificate has invalid format.');
     }
 
     $log.debug('Processing key from the cert response...');

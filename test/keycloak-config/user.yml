@@ -7,19 +7,19 @@ pipeline:
         user:
           username: test
           enabled: true
-          
+
           credentials:
             - type: password
               value: test
 
-          email: john@localhost
+          email: john@domain.com
           firstName: John
           lastName: Doe
-          
+
     - 'keycloak.user.mappings.roles.add':
         credentials: $ref:secrets.credentials
         realmName: $ref:ctx.realmName
-        email: john@localhost
+        email: john@domain.com
         roles:
           realm:
             - realm_role

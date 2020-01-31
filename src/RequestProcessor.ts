@@ -190,9 +190,19 @@ export class RequestProcessor {
 
         if (jwt) {
             headers['X-Auth-Token'] = jwt.token;
-            headers['X-Auth-Roles'] = jwt.getAllRoles().join(',');
-            headers['X-Auth-Username'] = jwt.payload.preferred_username;
-            headers['X-Auth-Email'] = jwt.payload.email;
+
+            const roles = jwt.getAllRoles();
+            if (roles.length) {
+                headers['X-Auth-Roles'] = roles.join(',');
+            }
+
+            if (jwt.payload.preferred_username) {
+                headers['X-Auth-Username'] = jwt.payload.preferred_username;
+            }
+
+            if (jwt.payload.email) {
+                headers['X-Auth-Email'] = jwt.payload.email;
+            }
         }
 
         // add x- forward headers if original request missing them

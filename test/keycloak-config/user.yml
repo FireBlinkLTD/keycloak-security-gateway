@@ -13,6 +13,7 @@ pipeline:
               value: test
 
           email: john@domain.com
+          emailVerified: true
           firstName: John
           lastName: Doe
 

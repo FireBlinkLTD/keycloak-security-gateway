@@ -26,6 +26,7 @@ const setAuthCookies = (
         serialize(cookieAccessToken, accessToken, {
             expires: accessTokenExp,
             secure: secureCookies,
+            sameSite: true,
             path: '/',
         }),
     ];
@@ -35,6 +36,7 @@ const setAuthCookies = (
             serialize(cookieRefreshToken, refreshToken, {
                 expires: refreshTokenExp,
                 secure: secureCookies,
+                sameSite: true,
                 path: '/',
             }),
         );

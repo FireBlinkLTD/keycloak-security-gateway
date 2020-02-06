@@ -10,12 +10,13 @@ log:
 
 keycloak:
   # client_id/secret pairs of supported KC clients
-  clients:
-      - clientId: <CLIENT_ID>
-        secret: <CLIENT_SECRET>
-        realmURL:
-          public: https://keycloak.example.com/auth/realms/<REALM_NAME>
-          private: http://keycloak.local:8080/auth/realms/<REALM_NAME>
+  clients: []
+      # - sid: test
+      #   clientId: <CLIENT_ID>
+      #   secret: <CLIENT_SECRET>
+      #   realmURL:
+      #     public: https://keycloak.example.com/auth/realms/<REALM_NAME>
+      #     private: http://keycloak.local:8080/auth/realms/<REALM_NAME>
 
     # additional scopes to add to add to the default (openid+email+profile)
   scopes: []

@@ -1,5 +1,8 @@
 *
 
+!/assets
+!/assets/**
+
 !/config
 !/config/default.yml
 !/config/test.yml

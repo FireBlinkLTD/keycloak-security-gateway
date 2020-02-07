@@ -1,0 +1,20 @@
+
+Browser->Load Balancer:Makes initial request to open the WEB page.
+
+Load Balancer->keycloak-security-gateway:Forwards the request.
+note over keycloak-security-gateway:Verifies that incomming request missing auth cookies.
+keycloak-security-gateway->Browser:Returns redirect to the Keycloak SSO Login page.
+Browser->Load Balancer:Makes the request to open Keycloak SSO Login page.
+Load Balancer->Keycloak:Forwards the request.
+Keycloak->Browser:Presents Login page.
+Browser->Load Balancer:Submits Login form.
+Load Balancer->Keycloak:Forwards the request.
+Keycloak->Browser:Sends redirect to the keycloak-security-gateway callback url.
+Browser->Load Balancer:Makes the request to call a callback url.
+Load Balancer->keycloak-security-gateway:Forwards the request.
+note over keycloak-security-gateway:Exchanges code from callback query parameter with Keycloak.
+keycloak-security-gateway->Browser:Returns redirect to the initial page and sets access/refresh token cookies.
+Browser->Load Balancer:Sends the request to open the page.
+Load Balancer->keycloak-security-gateway:Forwards the request.
+keycloak-security-gateway->Web Service:Forwards the request.
+note over keycloak-security-gateway:Validates access token cookie.\nIf needed exchanges refresh token for a new access one.

@@ -22,6 +22,9 @@ const setAuthCookies = (
     refreshToken: string,
     refreshTokenExp: Date,
 ) => {
+    $log.debug(`Setting Set-Cookie header for ${cookieAccessToken}: ${accessToken}`);
+    $log.debug(`Setting Set-Cookie header for ${cookieRefreshToken}: ${refreshToken}`);
+
     const cookies = [
         serialize(cookieAccessToken, accessToken, {
             expires: accessTokenExp,
@@ -36,7 +39,7 @@ const setAuthCookies = (
             serialize(cookieRefreshToken, refreshToken, {
                 expires: refreshTokenExp,
                 secure: secureCookies,
-                sameSite: true,
+                sameSite: 'lax',
                 path: '/',
             }),
         );

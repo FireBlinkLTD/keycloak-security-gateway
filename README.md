@@ -5,7 +5,21 @@
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/FireBlinkLTD/keycloak-security-gateway.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/FireBlinkLTD/keycloak-security-gateway/context:javascript)
 [![Greenkeeper badge](https://badges.greenkeeper.io/FireBlinkLTD/keycloak-security-gateway.svg)](https://greenkeeper.io/)
 
-Node.js based proxy service to secure applications and integrate with the Keycloak SSO flow with extra benefits comparing to Keycloak's Gatekeeper:
+Node.js based reverse proxy designed to secure applications by providing Keycloak SSO integration and JWT verification.
+
+## Common Architecture Diagram
+
+Note: this is just one common way of how keycloak-security-gateway service can be used, in a very complex service mesh there might be more than one keycloak-security-gateway.
+
+![Architecture Diagram](./assets/mesh.png)
+
+keycloak-security-gateway can be used to secure any kind of app, either it is a web page or a service that exposes APIs. In case of UI apps gateway will provide SSO integration and for APIs it will provide JWT verification (both online and offline). Of cource, RBAC is supported.
+
+## SSO Flow Sequence Diagram.
+
+![SSO Flow](./assets/sso.png)
+
+## What are the differences with Keycloak's Gatekeeper?
 
 | Feature                                                                               | fireblink/keycloak-security-gateway | keycloak/keycloak-gatekeeper                                          |
 | ------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------- |

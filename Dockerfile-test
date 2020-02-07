@@ -3,12 +3,12 @@ FROM node:lts-alpine as build
 WORKDIR /build
 COPY package.json package.json
 COPY yarn.lock yarn.lock
-RUN yarn 
+RUN yarn
 
 COPY . .
-RUN yarn build 
+RUN yarn build
 
-FROM fireblink/fbl-plugins:1.0.92
+FROM fireblink/fbl-plugins:1.0.141
 
 WORKDIR /app
 

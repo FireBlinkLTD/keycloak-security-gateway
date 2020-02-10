@@ -2,7 +2,6 @@ import { $log } from 'ts-log-debug';
 
 export class JWT {
     token: string;
-    realm!: string;
 
     header: any;
     payload: {
@@ -27,24 +26,12 @@ export class JWT {
     constructor(token: string) {
         this.token = token;
 
-        try {
-            const parts = token.split('.');
-            this.header = JSON.parse(Buffer.from(parts[0], 'base64').toString());
-            this.payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+        const parts = token.split('.');
+        this.header = JSON.parse(Buffer.from(parts[0], 'base64').toString());
+        this.payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
 
-            if (this.payload.iss && this.payload.iss.indexOf('/auth/realms/') > 0) {
-                this.realm = this.payload.iss.split('/auth/realms/')[1];
-            }
-
-            this.signature = Buffer.from(parts[2], 'base64');
-            this.signed = parts[0] + '.' + parts[1];
-        } catch (err) {
-            this.payload = {
-                iss: '',
-                azp: '',
-                exp: 0,
-            };
-        }
+        this.signature = Buffer.from(parts[2], 'base64');
+        this.signed = parts[0] + '.' + parts[1];
     }
 
     /**
@@ -93,8 +80,10 @@ export class JWT {
     getAllRoles(): string[] {
         const result: string[] = [];
 
+        /* istanbul ignore else */
         if (this.payload.resource_access) {
             for (const clientId of Object.keys(this.payload.resource_access)) {
+                /* istanbul ignore else */
                 if (this.payload.resource_access[clientId].roles) {
                     for (const role of this.payload.resource_access[clientId].roles) {
                         result.push(clientId + ':' + role);
@@ -103,6 +92,7 @@ export class JWT {
             }
         }
 
+        /* istanbul ignore else */
         if (this.payload.realm_access && this.payload.realm_access.roles) {
             result.push(...this.payload.realm_access.roles);
         }
@@ -130,6 +120,7 @@ export class JWT {
      * Check if JWT has client role
      */
     private hasClientRole(clientId: string, roleName: string): boolean {
+        /* istanbul ignore next */
         if (!this.payload.resource_access) {
             return false;
         }
@@ -147,6 +138,7 @@ export class JWT {
      * Check if JWT has realm role
      */
     private hasRealmRole(roleName: string): boolean {
+        /* istanbul ignore next */
         if (!this.payload.realm_access || !this.payload.realm_access.roles) {
             return false;
         }

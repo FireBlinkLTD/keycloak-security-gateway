@@ -34,16 +34,14 @@ const setAuthCookies = (
         }),
     ];
 
-    if (refreshToken) {
-        cookies.push(
-            serialize(cookieRefreshToken, refreshToken, {
-                expires: refreshTokenExp,
-                secure: secureCookies,
-                sameSite: 'lax',
-                path: '/',
-            }),
-        );
-    }
+    cookies.push(
+        serialize(cookieRefreshToken, refreshToken, {
+            expires: refreshTokenExp,
+            secure: secureCookies,
+            sameSite: 'lax',
+            path: '/',
+        }),
+    );
 
     res.setHeader('Set-Cookie', cookies);
 };
@@ -59,6 +57,7 @@ const sendJSONResponse = async (res: ServerResponse, body: any, statusCode = 200
     await new Promise((resolve, reject) => {
         res.setHeader('content-type', 'application/json');
         res.write(JSON.stringify(body), err => {
+            /* istanbul ignore next */
             if (err) {
                 $log.warn('Unable to write response', err);
 
@@ -84,6 +83,7 @@ const sendError = async (res: ServerResponse, statusCode: number, description: s
 
     await new Promise((resolve, reject) => {
         res.write(description, err => {
+            /* istanbul ignore next */
             if (err) {
                 $log.warn('Unable to write response', err);
 

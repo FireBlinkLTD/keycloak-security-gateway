@@ -22,9 +22,16 @@ class APIFlow {
                 this.lastRequestHeaders = req.headers;
                 res.statusCode = 200;
                 res.setHeader('content-type', 'application/json');
-                res.write('{"success":true}', () => {
-                    res.end();
-                });
+
+                res.write(
+                    JSON.stringify({
+                        success: true,
+                        url: req.url,
+                    }),
+                    () => {
+                        res.end();
+                    },
+                );
             });
 
             this.server.listen(7777, '0.0.0.0', () => {
@@ -47,7 +54,7 @@ class APIFlow {
 
         const accessToken = await this.getAccessToken();
 
-        const response = await request.get('/api', {
+        const response = await request.get('/api?queryString=yes', {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
@@ -55,9 +62,70 @@ class APIFlow {
 
         deepStrictEqual(response.data, {
             success: true,
+            url: '/api?queryString=yes',
         });
 
         strictEqual(this.lastRequestHeaders['x-test'], 'true');
+    }
+
+    @test()
+    async missingResourceMapping() {
+        const request = axios.create({
+            baseURL: get('host'),
+        });
+
+        const accessToken = await this.getAccessToken();
+
+        try {
+            await request.get('/_missing_', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            throw new Error('Should never be called');
+        } catch (err) {
+            strictEqual(err.response.status, 404);
+        }
+    }
+
+    @test()
+    async missingRequiredRoleInJWT() {
+        const request = axios.create({
+            baseURL: get('host'),
+        });
+
+        const accessToken = await this.getAccessToken();
+
+        try {
+            await request.get('/api/missing/role', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            throw new Error('Should never be called');
+        } catch (err) {
+            strictEqual(err.response.status, 403);
+        }
+    }
+
+    @test()
+    async invalidClientSID() {
+        const request = axios.create({
+            baseURL: get('host'),
+        });
+
+        const accessToken = await this.getAccessToken();
+
+        try {
+            await request.get('/invalid-client-sid', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            throw new Error('Should never be called');
+        } catch (err) {
+            strictEqual(err.response.status, 500);
+        }
     }
 
     /**

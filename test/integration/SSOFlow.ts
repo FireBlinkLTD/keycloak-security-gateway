@@ -48,6 +48,16 @@ class SSOFlow {
     }
 
     @test()
+    async logoutWithoutPreviousLogin() {
+        console.log('-> Opening browser page');
+        const page = await this.browser.newPage();
+
+        // logout
+        await this.getUnauthorized(page, '/logout');
+        strictEqual(page.url(), get('host') + '/');
+    }
+
+    @test()
     async logoutWithDefaultRedirectURL() {
         console.log('-> Opening browser page');
         const page = await this.browser.newPage();

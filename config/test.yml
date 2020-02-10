@@ -42,6 +42,10 @@ resources:
     clientSID: $1
     ssoFlow: true
 
+  - match: \/invalid-client-sid
+    clientSID: invalid-cient-sid
+    ssoFlow: true
+
   - match: /api
   - match: /
   - match: /public
@@ -54,10 +58,22 @@ resources:
         - test:test
 
   - match: /api/roles/any
+    methods:
+      - DELETE
+
+  - match: /api/roles/any
     roles:
       any:
         - realm_role
         - test:test
+    methods:
+      - GET
+      - POST
+
+  - match: /api/missing/role
+    roles:
+      all:
+        - missing_role
 
 jwtVerification: OFFLINE
 

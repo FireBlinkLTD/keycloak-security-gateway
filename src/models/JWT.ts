@@ -104,16 +104,19 @@ export class JWT {
      * Check if JWT has role
      * Examples:
      *  - realm_role - for realm level
-     *  - client_id:client_role - for client level
+     *  - some:r - will first try to find role "r" for client "some" and if not found will than try to find realm role "some:r"
      */
     hasRole(roleName: string): boolean {
-        if (roleName.indexOf(':') < 0) {
-            return this.hasRealmRole(roleName);
-        } else {
+        if (roleName.indexOf(':') > 0) {
             const parts = roleName.split(':');
+            const roleFound = this.hasClientRole(parts[0], roleName.substring(parts[0].length + 1));
 
-            return this.hasClientRole(parts[0], roleName.substring(parts[0].length + 1));
+            if (roleFound) {
+                return true;
+            }
         }
+
+        return this.hasRealmRole(roleName);
     }
 
     /**

@@ -16,7 +16,7 @@ keycloak:
         private: http://keycloak:8080/auth/realms/local
 
 # the upstream endpoint which we should proxy request
-upstreamURL: http://localhost:7777
+upstreamURL: http://localhost:7777/
 
 # additional scopes to add to add to the default (openid+email+profile)
 scopes: []

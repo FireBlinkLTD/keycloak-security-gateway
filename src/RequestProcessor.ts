@@ -60,8 +60,9 @@ export class RequestProcessor {
             resource.matchPattern = new RegExp(match, 'i');
         }
 
+        /* istanbul ignore else */
         if (this.upstreamURL[this.upstreamURL.length - 1] === '/') {
-            this.upstreamURL = this.upstreamURL.substring(0, this.upstreamURL.length - 2);
+            this.upstreamURL = this.upstreamURL.substring(0, this.upstreamURL.length - 1);
         }
     }
 

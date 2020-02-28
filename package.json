@@ -53,7 +53,7 @@
     "lint-staged": "10.0.8",
     "mocha": "7.0.1",
     "mocha-typescript": "1.1.17",
-    "mochawesome": "4.1.0",
+    "mochawesome": "5.0.0",
     "nyc": "15.0.0",
     "prettier": "1.19.1",
     "puppeteer": "2.1.1",

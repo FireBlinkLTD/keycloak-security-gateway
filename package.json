@@ -41,7 +41,7 @@
     "@types/http-proxy": "1.17.3",
     "@types/jsonwebtoken": "8.3.7",
     "@types/node": "13.7.5",
-    "@types/puppeteer": "2.0.0",
+    "@types/puppeteer": "2.0.1",
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "commitizen": "4.0.3",

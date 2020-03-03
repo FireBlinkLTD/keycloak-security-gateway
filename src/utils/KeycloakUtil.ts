@@ -173,7 +173,7 @@ const verifyOffline = async (accessToken: string): Promise<JWT | null> => {
     $log.debug('Verifying JWT token offline');
     const jwtToken = new JWT(accessToken);
 
-    const clientId: string = new JWT(accessToken).payload.azp;
+    const clientId: string = jwtToken.payload.azp;
     const clientConfiguration = clients.find(c => c.clientId === clientId);
 
     if (!clientConfiguration) {
@@ -185,11 +185,11 @@ const verifyOffline = async (accessToken: string): Promise<JWT | null> => {
     return new Promise<JWT>((resolve, reject) => {
         jwt.verify(accessToken, cert, (err: any) => {
             if (err) {
-                return reject(err);
-            }
+                if (err.expiredAt) {
+                    return resolve(null);
+                }
 
-            if (jwtToken.isExpired()) {
-                return resolve(null);
+                return reject(err);
             }
 
             resolve(jwtToken);

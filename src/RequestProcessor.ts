@@ -184,6 +184,10 @@ export class RequestProcessor {
         return jwt;
     }
 
+    /**
+     * Handle the logic to proxy request to the upstream endpoint
+     * Proxy also injects special headers for JWT fields and JWT itself
+     */
     private async proxyRequest(req: IncomingMessage, res: ServerResponse, target: string, jwt: JWT | null) {
         $log.info('Proxy request to:', target);
 

@@ -13,7 +13,7 @@ class SSOFlow {
     async before() {
         await start();
 
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
             this.server = createServer((req, res) => {
                 if (req.url === '/sso/') {
                     res.statusCode = 200;
@@ -100,7 +100,7 @@ class SSOFlow {
         const page = await this.browser.newPage();
 
         console.log('-> Opening /sso/ page');
-        await page.goto(get('host') + '/sso/test/', {
+        await page.goto(get('host') + '/sso/testEnv/', {
             waitUntil: 'networkidle0',
         });
 
@@ -124,7 +124,7 @@ class SSOFlow {
         await this.getUnauthorized(page, '/api');
 
         console.log('-> Opening /sso/ page');
-        await page.goto(get('host') + '/sso/test/', {
+        await page.goto(get('host') + '/sso/testEnv/', {
             waitUntil: 'networkidle0',
         });
 

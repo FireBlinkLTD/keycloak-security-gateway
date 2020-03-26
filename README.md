@@ -66,11 +66,21 @@ keycloak-security-gateway can be used to secure any kind of app, either it is a 
 # [required] Secondary identify, should be unique across all client configurations, used to match inside resource definitions
 sid: master-test
 
-# [required] Keycloak's Client "client_id" value
+# [optional] Keycloak's Client "client_id" value
+# Note: either clientId or clientIdEnv is required
 clientId: test
 
-# [required] Keycloak's Client "client_secret" value
+# [optional] Environment variable name to extract clientId value from
+# Note: either clientId or clientIdEnv is required
+clientIdEnv: KEYCLOAK_TEST_CLIENT_NAME
+
+# [optional] Keycloak's Client "client_secret" value
+# Note: either secret or secretEnv is required
 secret: 9067b642-015a-441a-816b-0c8d19305d10
+
+# [optional] Environment variable name to extract client_secret value from
+# Note: either secret or secretEnv is required
+secretEnv: KEYCLOAK_TEST_CLIENT_SECRET
 
 # [required] Keycloak Realm URLs
 realmURL:

@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile-test
     environment:
       NODE_ENV: test
+      KEYCLOAK_TEST_CLIENT_NAME: test
+      KEYCLOAK_TEST_CLIENT_SECRET: 9067b642-015a-441a-816b-0c8d19305d10
     ports:
       - 8888:8888
     volumes:

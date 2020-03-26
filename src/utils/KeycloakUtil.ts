@@ -32,11 +32,12 @@ const prepareRequest = (clientConfiguration: IClientConfiguration): AxiosInstanc
  * @param path
  */
 const prepareAuthURL = (clientConfiguration: IClientConfiguration, path: string): string => {
+    const clientId = clientConfiguration.clientId || process.env[clientConfiguration.clientIdEnv];
     const redirectUri = [
         host,
         callbackPath,
         `?src=${encodeURIComponent(path)}`,
-        `&clientId=${encodeURIComponent(clientConfiguration.clientId)}`,
+        `&clientId=${encodeURIComponent(clientId)}`,
     ].join('');
 
     const scope = ['openid', 'email', 'profile', ...scopes].join(' ');
@@ -44,7 +45,7 @@ const prepareAuthURL = (clientConfiguration: IClientConfiguration, path: string)
     return [
         clientConfiguration.realmURL.public,
         '/protocol/openid-connect/auth',
-        `?client_id=${encodeURIComponent(clientConfiguration.clientId)}`,
+        `?client_id=${encodeURIComponent(clientId)}`,
         `&redirect_uri=${encodeURIComponent(redirectUri)}`,
         '&response_type=code',
         `&scope=${encodeURIComponent(scope)}`,
@@ -57,12 +58,17 @@ const prepareAuthURL = (clientConfiguration: IClientConfiguration, path: string)
  */
 const refresh = async (refreshToken: string): Promise<ITokenResponse> => {
     const clientId: string = new JWT(refreshToken).payload.azp;
-    const clientConfiguration = clients.find(c => c.clientId === clientId);
+    const clientConfiguration = clients.find((c) => {
+        const cid = c.clientId || process.env[c.clientIdEnv];
+
+        return cid === clientId;
+    });
 
     if (!clientConfiguration) {
         throw new Error(`Unable to refresh token with clientId: ${clientId}. Client configuration not found.`);
     }
 
+    const secret = clientConfiguration.secret || process.env[clientConfiguration.secretEnv];
     const request = prepareRequest(clientConfiguration);
     const result = await request('/protocol/openid-connect/token', {
         method: 'POST',
@@ -70,7 +76,7 @@ const refresh = async (refreshToken: string): Promise<ITokenResponse> => {
             grant_type: 'refresh_token',
             refresh_token: refreshToken,
             client_id: clientId,
-            client_secret: clientConfiguration.secret,
+            client_secret: secret,
         }),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -87,7 +93,11 @@ const refresh = async (refreshToken: string): Promise<ITokenResponse> => {
  */
 const logout = async (accessToken: string, refreshToken: string): Promise<void> => {
     const clientId: string = new JWT(accessToken).payload.azp;
-    const clientConfiguration = clients.find(c => c.clientId === clientId);
+    const clientConfiguration = clients.find((c) => {
+        const cid = c.clientId || process.env[c.clientIdEnv];
+
+        return cid === clientId;
+    });
 
     if (!clientConfiguration) {
         throw new Error(
@@ -138,7 +148,11 @@ const handleCallbackRequest = async (url: string): Promise<ITokenResponse> => {
         `&clientId=${encodeURIComponent(clientId)}`,
     ].join('');
 
-    const clientConfiguration = clients.find(c => c.clientId === clientId);
+    const clientConfiguration = clients.find((c) => {
+        const cid = c.clientId || process.env[c.clientIdEnv];
+
+        return cid === clientId;
+    });
 
     if (!clientConfiguration) {
         throw new Error(`Unable to callback request with clientId: ${clientId}. Client configuration not found.`);
@@ -174,7 +188,11 @@ const verifyOffline = async (accessToken: string): Promise<JWT | null> => {
     const jwtToken = new JWT(accessToken);
 
     const clientId: string = jwtToken.payload.azp;
-    const clientConfiguration = clients.find(c => c.clientId === clientId);
+    const clientConfiguration = clients.find((c) => {
+        const cid = c.clientId || process.env[c.clientIdEnv];
+
+        return cid === clientId;
+    });
 
     if (!clientConfiguration) {
         throw new Error(`Unable to verify JWT offline with clientId: ${clientId}. Client configuration not found.`);
@@ -258,7 +276,11 @@ const verifyOnline = async (accessToken: string): Promise<JWT | null> => {
     const jwtToken = new JWT(accessToken);
 
     const clientId: string = new JWT(accessToken).payload.azp;
-    const clientConfiguration = clients.find(c => c.clientId === clientId);
+    const clientConfiguration = clients.find((c) => {
+        const cid = c.clientId || process.env[c.clientIdEnv];
+
+        return cid === clientId;
+    });
 
     if (!clientConfiguration) {
         throw new Error(`Unable to verify JWT online with clientId: ${clientId}. Client configuration not found.`);

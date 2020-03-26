@@ -15,6 +15,13 @@ keycloak:
         public: http://keycloak:8080/auth/realms/local
         private: http://keycloak:8080/auth/realms/local
 
+    - sid: testEnv
+      clientIdEnv: KEYCLOAK_TEST_CLIENT_NAME
+      secretEnv: KEYCLOAK_TEST_CLIENT_SECRET
+      realmURL:
+        public: http://keycloak:8080/auth/realms/local
+        private: http://keycloak:8080/auth/realms/local
+
 # the upstream endpoint which we should proxy request
 upstreamURL: http://localhost:7777/
 

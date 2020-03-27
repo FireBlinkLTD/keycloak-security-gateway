@@ -23,11 +23,18 @@ export class RequestProcessor {
     private resources: IResourceDefinition[] = JSON.parse(JSON.stringify(get('resources')));
     private clientConfigurations: IClientConfiguration[] = get('keycloak.clients');
     private jwtVerificationOnline = get('jwtVerification') === 'ONLINE';
-    private additionalHeaders: { [name: string]: string } = get('headers');
+    private requestHeaders: Record<string, string> = get('request.headers');
+    private responseHeaders: Record<string, string> = get('response.headers');
 
     constructor() {
-        this.proxy.on('error', err => {
+        this.proxy.on('error', (err) => {
             $log.error('Proxy error:', err);
+        });
+
+        this.proxy.on('proxyRes', (proxyRes, req, res) => {
+            for (const name of Object.keys(this.responseHeaders)) {
+                res.setHeader(name, this.responseHeaders[name]);
+            }
         });
 
         if (!this.resources) {
@@ -213,8 +220,8 @@ export class RequestProcessor {
         // add x- forward headers if original request missing them
         const xfwd = !req.headers['x-forwarded-for'];
 
-        for (const header of Object.keys(this.additionalHeaders)) {
-            const value = this.additionalHeaders[header];
+        for (const header of Object.keys(this.requestHeaders)) {
+            const value = this.requestHeaders[header];
             headers[header] = ejs.render(value, {
                 jwt,
                 req,
@@ -231,7 +238,7 @@ export class RequestProcessor {
                     headers,
                     xfwd,
                 },
-                err => {
+                (err) => {
                     if (err) {
                         return reject(err);
                     }
@@ -295,7 +302,7 @@ export class RequestProcessor {
      * @param res
      */
     process(req: IncomingMessage, res: ServerResponse) {
-        this.handleRequest(req, res).catch(err => {
+        this.handleRequest(req, res).catch((err) => {
             $log.error('Unexpected error occurred', err);
             sendError(res, 500, 'Unexpected error');
         });
@@ -334,7 +341,7 @@ export class RequestProcessor {
 
             if (result.resource.clientSID) {
                 result.resource.clientConfiguration = this.clientConfigurations.find(
-                    c => c.sid === result.resource.clientSID,
+                    (c) => c.sid === result.resource.clientSID,
                 );
                 if (!result.resource.clientConfiguration) {
                     throw new Error(

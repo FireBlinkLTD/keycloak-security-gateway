@@ -6,6 +6,14 @@ host: http://localhost:8888
 log:
   level: debug
 
+response:
+  headers:
+    X-RESPONSE-TEST: test
+
+request:
+  headers:
+    X-TEST: '<%- !!jwt %>'
+
 keycloak:
   clients:
     - sid: test
@@ -34,8 +42,6 @@ paths:
   health: /healthz
 
 logoutRedirectURL: /
-headers:
-  'X-TEST': '<%- !!jwt %>'
 
 cookie:
   secure: '0'

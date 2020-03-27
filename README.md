@@ -41,7 +41,7 @@ keycloak-security-gateway can be used to secure any kind of app, either it is a 
 - `APP_HOST` - Ingress host name associated with service
 - `APP_LOG_LEVEL` - Log level, `debug`, `info`, `error`
 
-- `APP_KEYCLOAK_CLIENTS` - JSON array of objects that represent Keycloak [Client Configuration](#client-configuration)
+- `APP_KEYCLOAK_CLIENTS` - JSON/YAML array of objects that represent Keycloak [Client Configuration](#client-configuration)
 
 - `APP_UPSTREAM_URL` - Upstream URL to forward requests to
 - `APP_LOGOUT_REDIRECT_URL` - URL or relative path to redirect user after logout. User can provide a query parameter `redirectTo` to override this setting on per request level.
@@ -55,10 +55,11 @@ keycloak-security-gateway can be used to secure any kind of app, either it is a 
 - `APP_COOKIE_REFRESH_TOKEN` - Refresh Token cookie name
 
 - `APP_JWT_VERIFICATION_MODE` - JWT verification mode, either `ONLINE` or `OFFLINE`
-- `APP_RESOURCES` - JSON array of objects that represent [Resource Configuration](#resource-configuration)
-- `APP_HEADERS` - JSON formatted key-value object of extra headers to add, value can be EJS template
+- `APP_RESOURCES` - JSON/YAML array of objects that represent [Resource Configuration](#resource-configuration)
+- `APP_REQUEST_HEADERS` - JSON/YAML formatted key-value object of extra headers to add/override before sending request to upstream service, value can be EJS template
+- `APP_RESPONSE_HEADERS` - JSON/YAML formatted key-value object of extra headers to add/override before sending request to a client
 
-## Configuration Defintions
+## Configuration Definitions
 
 ### Client Configuration
 

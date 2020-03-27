@@ -17,7 +17,7 @@ class APIFlow {
     async before() {
         await start();
 
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
             this.server = createServer((req, res) => {
                 this.lastRequestHeaders = req.headers;
                 res.statusCode = 200;
@@ -65,6 +65,7 @@ class APIFlow {
             url: '/api?queryString=yes',
         });
 
+        strictEqual(response.headers['x-response-test'], 'test');
         strictEqual(this.lastRequestHeaders['x-test'], 'true');
     }
 

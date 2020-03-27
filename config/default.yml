@@ -8,6 +8,14 @@ host: http://127.0.0.1:3000
 log:
   level: info
 
+response:
+  # custom headers to add to every response before sending response to a client
+  headers: {}
+
+request:
+  # custom headers to add to every request before making a call to upstream service
+  headers: {}
+
 keycloak:
   # client_id/secret pairs of supported KC clients
   clients: []
@@ -35,8 +43,6 @@ paths:
 
 # Redirect URL to be used upon logout
 logoutRedirectURL: /
-
-headers: {}
 
 cookie:
   secure: '1'

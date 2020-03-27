@@ -6,14 +6,24 @@ host: APP_HOST
 log:
   level: APP_LOG_LEVEL
 
+response:
+  headers:
+    __name: APP_RESPONSE_HEADERS
+    __format: yaml
+
+request:
+  headers:
+    __name: APP_REQUEST_HEADERS
+    __format: yaml
+
 keycloak:
   clients:
     __name: APP_KEYCLOAK_CLIENTS
-    __format: json
+    __format: yaml
 
   scopes:
     __name: APP_KEYCLOAK_SCOPES
-    __format: json
+    __format: yaml
 
 upstreamURL: APP_UPSTREAM_URL
 
@@ -23,10 +33,6 @@ paths:
   health: APP_PATHS_HEALTH
 
 logoutRedirectURL: APP_LOGOUT_REDIRECT_URL
-
-headers:
-  __name: APP_HEADERS
-  __format: json
 
 cookie:
   secure: APP_COOKIE_SECURE

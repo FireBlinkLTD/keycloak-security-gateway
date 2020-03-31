@@ -50,7 +50,7 @@
     "express": "4.17.1",
     "husky": "4.2.3",
     "jsonlint": "1.6.3",
-    "lint-staged": "10.1.0",
+    "lint-staged": "10.1.1",
     "mocha": "7.1.1",
     "mocha-typescript": "1.1.17",
     "mochawesome": "5.0.0",

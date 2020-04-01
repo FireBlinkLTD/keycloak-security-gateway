@@ -33,7 +33,13 @@ export class RequestProcessor {
 
         this.proxy.on('proxyRes', (proxyRes, req, res) => {
             for (const name of Object.keys(this.responseHeaders)) {
-                res.setHeader(name, this.responseHeaders[name]);
+                delete proxyRes.headers[name.toLowerCase()];
+
+                if (this.responseHeaders[name]) {
+                    proxyRes.headers[name] = this.responseHeaders[name];
+                } else {
+                    res.removeHeader(name);
+                }
             }
         });
 

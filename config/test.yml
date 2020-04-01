@@ -9,6 +9,8 @@ log:
 response:
   headers:
     X-RESPONSE-TEST: test
+    X-OVERRIDE: new-value
+    X-REMOVE: null
 
 request:
   headers:

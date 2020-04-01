@@ -22,6 +22,8 @@ class APIFlow {
                 this.lastRequestHeaders = req.headers;
                 res.statusCode = 200;
                 res.setHeader('content-type', 'application/json');
+                res.setHeader('x-override', Date.now().toString());
+                res.setHeader('x-remove', Date.now().toString());
 
                 res.write(
                     JSON.stringify({
@@ -65,8 +67,10 @@ class APIFlow {
             url: '/api?queryString=yes',
         });
 
-        strictEqual(response.headers['x-response-test'], 'test');
         strictEqual(this.lastRequestHeaders['x-test'], 'true');
+        strictEqual(response.headers['x-response-test'], 'test');
+        strictEqual(response.headers['x-override'], 'new-value');
+        strictEqual(response.headers['x-remove'], undefined);
     }
 
     @test()

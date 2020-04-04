@@ -106,12 +106,13 @@ const logout = async (accessToken: string, refreshToken: string): Promise<void> 
     }
 
     const request = prepareRequest(clientConfiguration);
+    const secret = clientConfiguration.secret || process.env[clientConfiguration.secretEnv];
     await request('/protocol/openid-connect/logout', {
         method: 'POST',
         data: stringify({
             refresh_token: refreshToken,
             client_id: clientId,
-            client_secret: clientConfiguration.secret,
+            client_secret: secret,
         }),
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -159,12 +160,13 @@ const handleCallbackRequest = async (url: string): Promise<ITokenResponse> => {
     }
 
     const request = prepareRequest(clientConfiguration);
+    const secret = clientConfiguration.secret || process.env[clientConfiguration.secretEnv];
     const result = await request('/protocol/openid-connect/token', {
         method: 'POST',
         data: stringify({
             code: query.code,
             client_id: clientId,
-            client_secret: clientConfiguration.secret,
+            client_secret: secret,
             grant_type: 'authorization_code',
             redirect_uri: redirectUri,
         }),

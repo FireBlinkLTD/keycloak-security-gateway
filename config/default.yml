@@ -37,7 +37,9 @@ paths:
   # OID callback path
   callback: /oauth/callback
   # User logout path
-  logout: /logout
+  logout: /oauth/logout
+  # User roles
+  roles: /oauth/roles
   # Application healthcheck endpoint
   health: /healthz
 

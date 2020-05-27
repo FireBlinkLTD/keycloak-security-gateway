@@ -149,7 +149,7 @@ class SSOFlow {
         });
 
         const body = await page.evaluate(() => document.querySelector('pre').innerHTML);
-        strictEqual(body, 'Unathorized');
+        strictEqual(body, 'Unauthorized');
     }
 
     /**

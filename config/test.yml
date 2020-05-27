@@ -39,7 +39,8 @@ upstreamURL: http://localhost:7777/
 scopes: []
 
 paths:
-  callback: /oauth/callback
+  callback: /callback
+  roles: /roles
   logout: /logout
   health: /healthz
 

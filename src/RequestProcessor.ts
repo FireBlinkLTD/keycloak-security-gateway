@@ -10,6 +10,7 @@ import { extractAccessToken, extractRefreshToken, extractRequestPath } from './u
 
 import handleHealthRoute from './routes/HealthRoute';
 import handleLogoutRoute from './routes/LogoutRoute';
+import handleRolesRoute from './routes/RolesRoute';
 
 import { prepareAuthURL, verifyOnline, verifyOffline, handleCallbackRequest, refresh } from './utils/KeycloakUtil';
 import { IClientConfiguration } from './interfaces/IClientConfiguration';
@@ -20,6 +21,7 @@ export class RequestProcessor {
     private callbackPath: string = get('paths.callback');
     private logoutPath: string = get('paths.logout');
     private healthPath: string = get('paths.health');
+    private rolesPath: string = get('paths.roles');
     private resources: IResourceDefinition[] = JSON.parse(JSON.stringify(get('resources')));
     private clientConfigurations: IClientConfiguration[] = get('keycloak.clients');
     private jwtVerificationOnline = get('jwtVerification') === 'ONLINE';
@@ -136,7 +138,7 @@ export class RequestProcessor {
             const authURL = prepareAuthURL(result.resource.clientConfiguration, path);
             await sendRedirect(res, authURL);
         } else {
-            await sendError(res, 401, 'Unathorized');
+            await sendError(res, 401, 'Unauthorized');
         }
 
         return null;
@@ -273,6 +275,12 @@ export class RequestProcessor {
 
         if (path === this.healthPath) {
             await handleHealthRoute(res);
+
+            return;
+        }
+
+        if (path === this.rolesPath) {
+            await handleRolesRoute(req, res);
 
             return;
         }

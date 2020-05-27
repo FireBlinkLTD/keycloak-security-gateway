@@ -31,6 +31,7 @@ keycloak-security-gateway can be used to secure any kind of app, either it is a 
 | JWT online verification strategy                                                      | Yes                                 | No                                                                    |
 | Flexible role based access (like: at least one of the roles required, not simply all) | Yes                                 | Yes (either all or at least one, but not both rules at the same time) |
 | Multiple KC clients supported                                                         | Yes                                 | No                                                                    |
+| Roles endpoint to get all roles from JWT token (no need to parse JWT on SPA side)     | Yes                                 | No                                                                    |
 
 ## Configuration
 
@@ -47,8 +48,9 @@ keycloak-security-gateway can be used to secure any kind of app, either it is a 
 - `APP_LOGOUT_REDIRECT_URL` - URL or relative path to redirect user after logout. User can provide a query parameter `redirectTo` to override this setting on per request level.
 
 - `APP_PATHS_CALLBACK` - Routing path to use for SSO authentication callback, e.g. `/oauth/callback`
-- `APP_PATHS_LOGOUT` - Logout path to use, e.g. `/logout`
+- `APP_PATHS_LOGOUT` - Logout path to use, e.g. `/oauth/logout`
 - `APP_PATHS_HEALTH` - Gateway health endpoint, e.g. `/healthz`
+- `APP_PATHS_ROLES` - Roles endpoint, e.g. `/oauth/roles`, endpoint extracts all roles from JWT including realm and client ones and returns all as single JSON array.
 
 - `APP_COOKIE_SECURE` - Either cookies should be used only with HTTPS connection
 - `APP_COOKIE_ACCESS_TOKEN` - Access Token cookie name

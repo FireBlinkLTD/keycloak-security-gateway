@@ -1,9 +1,20 @@
 pull_request_rules:
-  - name: automatic merge of greenkeeper PRs to develop branch
+  - name: automatic merge of dependabot PRs to develop branch
     conditions:
       - 'status-success=ci/circleci: build'
-      - 'base=master'
-      - 'author=greenkeeper[bot]'
+      - 'base=develop'
+      - 'author=dependabot[bot]'
     actions:
       merge:
         method: merge
+      delete_head_branch: {}
+
+  - name: automatic merge of dependabot PRs to develop branch
+    conditions:
+      - 'status-success=ci/circleci: build'
+      - 'base=develop'
+      - 'author=snyk-bot'
+    actions:
+      merge:
+        method: merge
+      delete_head_branch: {}

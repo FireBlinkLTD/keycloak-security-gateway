@@ -16,7 +16,7 @@ class AccessRoute extends BaseSuite {
     }
 
     @test()
-    async allowedResource() {
+    async authorizedOne() {
         const request = axios.create({
             baseURL: get('host'),
         });
@@ -28,18 +28,17 @@ class AccessRoute extends BaseSuite {
                 Authorization: `Bearer ${accessToken}`,
             },
             params: {
-                path: '/api',
-                method: 'GET',
+                resource: 'GET:/api',
             },
         });
 
         deepStrictEqual(response.data, {
-            allowed: true,
+            ['GET:/api']: true,
         });
     }
 
     @test()
-    async forbiddenResource() {
+    async authorizedMany() {
         const request = axios.create({
             baseURL: get('host'),
         });
@@ -51,13 +50,13 @@ class AccessRoute extends BaseSuite {
                 Authorization: `Bearer ${accessToken}`,
             },
             params: {
-                path: '/api/roles/all',
-                method: 'GET',
+                resource: 'GET:/api,GET:/api/roles/all',
             },
         });
 
         deepStrictEqual(response.data, {
-            allowed: false,
+            ['GET:/api']: true,
+            ['GET:/api/roles/all']: false,
         });
     }
 
@@ -69,13 +68,12 @@ class AccessRoute extends BaseSuite {
 
         const response = await request.get(get('paths.access'), {
             params: {
-                path: '/public',
-                method: 'GET',
+                resource: 'GET:/public',
             },
         });
 
         deepStrictEqual(response.data, {
-            allowed: true,
+            ['GET:/public']: true,
         });
     }
 }

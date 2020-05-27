@@ -9,44 +9,55 @@ import { parse } from 'url';
 
 const handler = async (req: IncomingMessage, res: ServerResponse) => {
     $log.debug('Handling logout request');
-    const { path, method } = parse(req.url, true).query;
+    const { resource } = parse(req.url, true).query;
 
-    if (!path) {
-        return await sendError(res, 400, '"path" query parameter is missing');
+    if (!resource) {
+        return await sendError(res, 400, '"resource" query parameter is missing');
     }
 
-    if (!method) {
-        return await sendError(res, 400, '"method" query parameter is missing');
+    const resources: string[] = Array.isArray(resource) ? resource : resource.toString().split(',');
+
+    const accessToken = extractAccessToken(req);
+    let jwt: JWT = null;
+    if (accessToken) {
+        jwt = new JWT(accessToken);
     }
 
-    const targetPath = findResourceByPathAndMethod(path.toString(), method.toString());
+    const result: { [key: string]: boolean } = {};
+    for (const r of resources) {
+        const chunks = r.split(':');
+        if (chunks.length !== 2) {
+            return await sendError(res, 400, '"resource" query parameter has invalid format');
+        }
+
+        result[r] = isAllowed(chunks[1], chunks[0], jwt);
+    }
+
+    return await sendJSONResponse(res, result);
+};
+
+const isAllowed = (path: string, method: string, jwt?: JWT): boolean => {
+    const targetPath = findResourceByPathAndMethod(path, method);
 
     if (!targetPath) {
-        return await sendError(res, 404, 'Mapping not found');
+        $log.warn(`Unable to verify is client can access ${method} ${path}`);
+
+        return false;
     }
 
     if (!targetPath.resource.public) {
-        const accessToken = extractAccessToken(req);
-
-        if (!accessToken) {
-            return await sendJSONResponse(res, {
-                allowed: false,
-            });
+        if (!jwt) {
+            return false;
         }
 
-        const jwtToken = new JWT(accessToken);
         if (targetPath.resource.roles) {
-            if (!jwtToken.verifyRoles(targetPath.resource.roles)) {
-                return await sendJSONResponse(res, {
-                    allowed: false,
-                });
+            if (!jwt.verifyRoles(targetPath.resource.roles)) {
+                return false;
             }
         }
     }
 
-    return await sendJSONResponse(res, {
-        allowed: true,
-    });
+    return true;
 };
 
 export default handler;

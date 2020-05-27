@@ -156,18 +156,21 @@ Make sure client has all the necessary roles included in the scope, or "Full Sco
 
 ### Access Endpoint
 
-Allows to check if client can access specified resource.
+Allows to check if client can access specified resource(s).
 
-Request requires 2 query parameters to be provided:
+Request requires `resource` query parameters to be provided. Value should be a comma separated pairs of method and resource path.
 
-- `path` resource path to check, e.g. `/api/users`
-- `method` HTTP request method for the resource access, e.g. `GET`
+Examples values:
 
-Response example:
+- `GET:/api` - single resource to check for HTTP method `GET` and path `/api`
+- `GET:/api,POST:/api/user` - multiple resources to check
+
+Response is an object of all requested paths and boolean value identifying that resource can be accessed or not:
 
 ```json
 {
-  "allowed": true
+  "GET:/api": true,
+  "POST:/api/user": false
 }
 ```
 

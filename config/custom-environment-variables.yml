@@ -28,6 +28,7 @@ keycloak:
 upstreamURL: APP_UPSTREAM_URL
 
 paths:
+  access: APP_PATHS_ACCESS
   callback: APP_PATHS_CALLBACK
   logout: APP_PATHS_LOGOUT
   health: APP_PATHS_HEALTH

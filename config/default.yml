@@ -38,10 +38,13 @@ paths:
   callback: /oauth/callback
   # User logout path
   logout: /oauth/logout
+  # Check resource access path
+  access: /oauth/access
   # User roles
   roles: /oauth/roles
   # Application healthcheck endpoint
   health: /healthz
+
 
 # Redirect URL to be used upon logout
 logoutRedirectURL: /

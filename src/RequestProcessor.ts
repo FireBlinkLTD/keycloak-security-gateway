@@ -1,19 +1,20 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { createProxyServer } from 'http-proxy';
 import { get } from 'config';
-import { IResourceDefinition, ITargetPathResult } from './interfaces';
+import { ITargetPathResult } from './interfaces';
 import { JWT } from './models/JWT';
 import { $log } from 'ts-log-debug';
 import * as ejs from 'ejs';
 import { sendError, sendRedirect, setAuthCookies } from './utils/ResponseUtil';
 import { extractAccessToken, extractRefreshToken, extractRequestPath } from './utils/RequestUtil';
+import { findResourceByPathAndMethod } from './utils/ResourceUtils';
 
 import handleHealthRoute from './routes/HealthRoute';
 import handleLogoutRoute from './routes/LogoutRoute';
 import handleRolesRoute from './routes/RolesRoute';
+import handleAccessRoute from './routes/AccessRoute';
 
 import { prepareAuthURL, verifyOnline, verifyOffline, handleCallbackRequest, refresh } from './utils/KeycloakUtil';
-import { IClientConfiguration } from './interfaces/IClientConfiguration';
 
 export class RequestProcessor {
     private proxy = createProxyServer();
@@ -21,9 +22,8 @@ export class RequestProcessor {
     private callbackPath: string = get('paths.callback');
     private logoutPath: string = get('paths.logout');
     private healthPath: string = get('paths.health');
+    private accessPath: string = get('paths.access');
     private rolesPath: string = get('paths.roles');
-    private resources: IResourceDefinition[] = JSON.parse(JSON.stringify(get('resources')));
-    private clientConfigurations: IClientConfiguration[] = get('keycloak.clients');
     private jwtVerificationOnline = get('jwtVerification') === 'ONLINE';
     private requestHeaders: Record<string, string> = get('request.headers');
     private responseHeaders: Record<string, string> = get('response.headers');
@@ -44,36 +44,6 @@ export class RequestProcessor {
                 }
             }
         });
-
-        if (!this.resources) {
-            this.resources = [
-                {
-                    match: '.*',
-                },
-            ];
-        }
-
-        for (const resource of this.resources) {
-            if (resource.ssoFlow) {
-                if (!resource.clientSID) {
-                    throw new Error(
-                        `"clientSID" is missing in resource definition that matches: "${resource.match}" and has ssoFlow enabled`,
-                    );
-                }
-            }
-
-            let match = resource.match;
-
-            if (match.indexOf('^') !== 0) {
-                match = '^' + match;
-            }
-
-            if (!match.endsWith('$')) {
-                match = match + '$';
-            }
-
-            resource.matchPattern = new RegExp(match, 'i');
-        }
 
         /* istanbul ignore else */
         if (this.upstreamURL[this.upstreamURL.length - 1] === '/') {
@@ -100,13 +70,13 @@ export class RequestProcessor {
     }
 
     /**
-     * Handle unathorized flow
+     * Handle unauthorized flow
      * @param req
      * @param res
      * @param path
      * @param result
      */
-    private async handleUnathorizedFlow(
+    private async handleUnauthorizedFlow(
         req: IncomingMessage,
         res: ServerResponse,
         path: string,
@@ -161,7 +131,7 @@ export class RequestProcessor {
         let jwt: JWT;
 
         if (!token) {
-            token = await this.handleUnathorizedFlow(req, res, path, result);
+            token = await this.handleUnauthorizedFlow(req, res, path, result);
 
             if (!token) {
                 return null;
@@ -177,7 +147,7 @@ export class RequestProcessor {
         }
 
         if (!jwt) {
-            token = await this.handleUnathorizedFlow(req, res, path, result);
+            token = await this.handleUnauthorizedFlow(req, res, path, result);
 
             if (!token) {
                 return null;
@@ -262,30 +232,26 @@ export class RequestProcessor {
         $log.info(`New request received. method: ${req.method}; path: ${path}`);
 
         if (path === this.callbackPath) {
-            await this.handleCallback(req, res);
-
-            return;
+            return await this.handleCallback(req, res);
         }
 
         if (path === this.logoutPath) {
-            await handleLogoutRoute(req, res);
-
-            return;
+            return await handleLogoutRoute(req, res);
         }
 
         if (path === this.healthPath) {
-            await handleHealthRoute(res);
-
-            return;
+            return await handleHealthRoute(res);
         }
 
         if (path === this.rolesPath) {
-            await handleRolesRoute(req, res);
-
-            return;
+            return await handleRolesRoute(req, res);
         }
 
-        const result = this.findTargetPath(req, path);
+        if (path === this.accessPath) {
+            return await handleAccessRoute(req, res);
+        }
+
+        const result = findResourceByPathAndMethod(path, req.method);
 
         if (!result) {
             await sendError(res, 404, 'Not found');
@@ -320,61 +286,5 @@ export class RequestProcessor {
             $log.error('Unexpected error occurred', err);
             sendError(res, 500, 'Unexpected error');
         });
-    }
-
-    /**
-     * Find target path
-     * @param req
-     * @param path
-     */
-    private findTargetPath(req: IncomingMessage, path: string): ITargetPathResult | null {
-        $log.debug('Looking to find destination path');
-
-        for (const resource of this.resources) {
-            // first check if method is listed
-            if (resource.methods && resource.methods.indexOf(req.method) < 0) {
-                continue;
-            }
-
-            // try to match pattern
-            const match = resource.matchPattern.exec(path);
-            if (!match) {
-                continue;
-            }
-
-            const result = {
-                path,
-                resource: {
-                    ...resource,
-                },
-            };
-
-            if (resource.clientSID && resource.clientSID[0] === '$') {
-                result.resource.clientSID = match[Number(resource.clientSID.substring(1))];
-            }
-
-            if (result.resource.clientSID) {
-                result.resource.clientConfiguration = this.clientConfigurations.find(
-                    (c) => c.sid === result.resource.clientSID,
-                );
-                if (!result.resource.clientConfiguration) {
-                    throw new Error(
-                        `Unable to find matching client configuration for clientSID "${result.resource.clientSID}" that matches: "${resource.match}" and has ssoFlow enabled`,
-                    );
-                }
-            }
-
-            if (resource.override) {
-                result.path = path.replace(resource.matchPattern, resource.override);
-            }
-
-            $log.debug('Destination resource found', result);
-
-            return result;
-        }
-
-        $log.debug('Destination resource not found');
-
-        return null;
     }
 }

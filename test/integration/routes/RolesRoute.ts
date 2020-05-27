@@ -3,13 +3,10 @@ import { get } from 'config';
 import axios from 'axios';
 import { strictEqual, ok } from 'assert';
 import { start, stop } from '../../../src';
-import { IClientConfiguration } from '../../../src/interfaces/IClientConfiguration';
-import { stringify } from 'querystring';
-
-const clients: IClientConfiguration[] = get('keycloak.clients');
+import { BaseSuite } from '../BaseSuite';
 
 @suite()
-class RolesRoute {
+class RolesRoute extends BaseSuite {
     async before() {
         await start();
     }
@@ -50,31 +47,5 @@ class RolesRoute {
         }
 
         strictEqual(code, 401);
-    }
-
-    /**
-     * Authenticate with service account
-     */
-    private async getAccessToken(): Promise<string> {
-        console.log('-> Retrieving access_token from KC...');
-        const request = axios.create({
-            baseURL: clients[0].realmURL.private,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        });
-
-        const result = await request('/protocol/openid-connect/token', {
-            method: 'POST',
-            data: stringify({
-                grant_type: 'client_credentials',
-                client_id: 'test',
-                client_secret: clients[0].secret,
-            }),
-        });
-
-        console.log(`-> Access token: ${result.data.access_token}`);
-
-        return result.data.access_token;
     }
 }

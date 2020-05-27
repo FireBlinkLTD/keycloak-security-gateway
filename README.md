@@ -47,6 +47,7 @@ keycloak-security-gateway can be used to secure any kind of app, either it is a 
 - `APP_UPSTREAM_URL` - Upstream URL to forward requests to
 - `APP_LOGOUT_REDIRECT_URL` - URL or relative path to redirect user after logout. User can provide a query parameter `redirectTo` to override this setting on per request level.
 
+- `APP_PATHS_ACCESS` - Access verification endpoint path. Endpoint allows to check if client has access to specific resource, e.g. `/oauth/access`
 - `APP_PATHS_CALLBACK` - Routing path to use for SSO authentication callback, e.g. `/oauth/callback`
 - `APP_PATHS_LOGOUT` - Logout path to use, e.g. `/oauth/logout`
 - `APP_PATHS_HEALTH` - Gateway health endpoint, e.g. `/healthz`
@@ -150,3 +151,32 @@ Slow, as every request will be verified with Keycloak, however guarantees that i
 ### User has role, but still could not access resource.
 
 Make sure client has all the necessary roles included in the scope, or "Full Scope Allowed" toggle is turned on.
+
+## Endpoints
+
+### Access Endpoint
+
+Allows to check if client can access specified resource.
+
+Request requires 2 query parameters to be provided:
+
+- `path` resource path to check, e.g. `/api/users`
+- `method` HTTP request method for the resource access, e.g. `GET`
+
+Response example:
+
+```json
+{
+  "allowed": true
+}
+```
+
+### Roles Endpoint
+
+Allows to retrieve all the roles JWT contains. Can be used by client application, though it is recommended to use access endpoint to check individual endpoints for access instead.
+
+Response example:
+
+```json
+["realm_role", "client_id:client_role"]
+```

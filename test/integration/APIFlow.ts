@@ -4,12 +4,10 @@ import { start, stop } from '../../src';
 import { createServer, Server, IncomingHttpHeaders } from 'http';
 import axios from 'axios';
 import { deepStrictEqual, strictEqual } from 'assert';
-import { stringify } from 'querystring';
-import { IClientConfiguration } from '../../src/interfaces/IClientConfiguration';
-const clients: IClientConfiguration[] = get('keycloak.clients');
+import { BaseSuite } from './BaseSuite';
 
 @suite()
-class APIFlow {
+class APIFlow extends BaseSuite {
     private server: Server;
 
     private lastRequestHeaders: IncomingHttpHeaders;
@@ -131,31 +129,5 @@ class APIFlow {
         } catch (err) {
             strictEqual(err.response.status, 500);
         }
-    }
-
-    /**
-     * Authenticate with service account
-     */
-    private async getAccessToken(): Promise<string> {
-        console.log('-> Retrieving access_token from KC...');
-        const request = axios.create({
-            baseURL: clients[0].realmURL.private,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        });
-
-        const result = await request('/protocol/openid-connect/token', {
-            method: 'POST',
-            data: stringify({
-                grant_type: 'client_credentials',
-                client_id: 'test',
-                client_secret: clients[0].secret,
-            }),
-        });
-
-        console.log(`-> Access token: ${result.data.access_token}`);
-
-        return result.data.access_token;
     }
 }

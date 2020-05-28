@@ -3,6 +3,7 @@ FROM node:lts-alpine as build
 WORKDIR /build
 COPY package.json package.json
 COPY yarn.lock yarn.lock
+COPY .snyk .snyk
 RUN yarn
 
 COPY . .

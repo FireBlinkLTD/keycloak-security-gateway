@@ -3,10 +3,11 @@ FROM node:lts-alpine as build
 WORKDIR /build
 COPY package.json package.json
 COPY yarn.lock yarn.lock
-RUN yarn 
+COPY .snyk .snyk
+RUN yarn
 
 COPY . .
-RUN yarn build 
+RUN yarn build
 RUN yarn install --prod
 
 FROM node:lts-alpine

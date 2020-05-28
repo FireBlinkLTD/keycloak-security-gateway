@@ -1,4 +1,4 @@
-import { $log } from 'ts-log-debug';
+import { $log } from '@tsed/logger';
 import { IncomingMessage } from 'http';
 import { parse } from 'cookie';
 import { get } from 'config';

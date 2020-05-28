@@ -1,13 +1,13 @@
 import { get } from 'config';
 import { createServer, IncomingMessage, ServerResponse, Server } from 'http';
 import { RequestProcessor } from './RequestProcessor';
-import { $log } from 'ts-log-debug';
+import { $log } from '@tsed/logger';
 
 $log.level = get('log.level');
 
 let server: Server;
 const start = async () => {
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
         const requestProcessor = new RequestProcessor();
         server = createServer((req: IncomingMessage, res: ServerResponse) => {
             requestProcessor.process(req, res);
@@ -25,7 +25,7 @@ const start = async () => {
 
 const stop = async () => {
     await new Promise((resolve, reject) => {
-        server.close(err => {
+        server.close((err) => {
             if (err) {
                 return reject(err);
             }
@@ -37,7 +37,7 @@ const stop = async () => {
 };
 
 if (process.env.NODE_ENV !== 'test') {
-    start().catch(err => {
+    start().catch((err) => {
         $log.error(err);
         process.exit(1);
     });

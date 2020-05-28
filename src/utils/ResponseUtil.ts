@@ -1,4 +1,4 @@
-import { $log } from 'ts-log-debug';
+import { $log } from '@tsed/logger';
 import { ServerResponse } from 'http';
 import { serialize } from 'cookie';
 import { get } from 'config';
@@ -56,7 +56,7 @@ const sendJSONResponse = async (res: ServerResponse, body: any, statusCode = 200
     res.statusCode = statusCode;
     await new Promise((resolve, reject) => {
         res.setHeader('content-type', 'application/json');
-        res.write(JSON.stringify(body), err => {
+        res.write(JSON.stringify(body), (err) => {
             /* istanbul ignore next */
             if (err) {
                 $log.warn('Unable to write response', err);
@@ -82,7 +82,7 @@ const sendError = async (res: ServerResponse, statusCode: number, description: s
     res.statusCode = statusCode;
 
     await new Promise((resolve, reject) => {
-        res.write(description, err => {
+        res.write(description, (err) => {
             /* istanbul ignore next */
             if (err) {
                 $log.warn('Unable to write response', err);
@@ -107,7 +107,7 @@ const sendRedirect = async (res: ServerResponse, url: string, statusCode = 307) 
     $log.debug('Redirecting to:', url);
     res.statusCode = statusCode;
     res.setHeader('Location', url);
-    await new Promise(resolve => res.end(resolve));
+    await new Promise((resolve) => res.end(resolve));
 };
 
 export { sendError, sendRedirect, sendJSONResponse, setAuthCookies };

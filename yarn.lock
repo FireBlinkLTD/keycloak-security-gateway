@@ -339,7 +339,7 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@tsed/logger@5.5.0":
+"@tsed/logger@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@tsed/logger/-/logger-5.5.0.tgz#2fcfd2e6baadc93b2a16bde0a20ea28ac9b075b9"
   integrity sha512-NzLc+CRob8tGPXf9jMt++JpckqG8uZACLWK5Ep3rJOz40t9y7Uyh4rOUfRgj33QiUz3/sATfB1S/5uYtvjTVdA==
@@ -5136,13 +5136,6 @@ trim-off-newlines@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
   integrity sha1-n5up2e+odkw4dpi8v+sshI8RrbM=
-
-ts-log-debug@5.5.0:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/ts-log-debug/-/ts-log-debug-5.5.0.tgz#9561f7f40276c26e406c64c98155f9eb844effb1"
-  integrity sha512-arMfr8UfHNehIFxOVoxue1A1M/WkY9W1lLfRqUcTq4/XX6FU56IIq5uWFPg+3VjGtGTnA6nhDBnDN6jukvZRzg==
-  dependencies:
-    "@tsed/logger" "5.5.0"
 
 ts-node@8.10.1:
   version "8.10.1"

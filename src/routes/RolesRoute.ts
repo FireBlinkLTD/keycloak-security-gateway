@@ -1,5 +1,5 @@
 import { ServerResponse, IncomingMessage } from 'http';
-import { $log } from 'ts-log-debug';
+import { $log } from '@tsed/logger';
 import { extractAccessToken } from '../utils/RequestUtil';
 import { sendError } from '../utils/ResponseUtil';
 import { sendJSONResponse } from '../utils/ResponseUtil';

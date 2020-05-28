@@ -1,5 +1,5 @@
 import { ServerResponse, IncomingMessage } from 'http';
-import { $log } from 'ts-log-debug';
+import { $log } from '@tsed/logger';
 import { extractAccessToken, extractRefreshToken } from '../utils/RequestUtil';
 import { logout, preparePostLogoutURL } from '../utils/KeycloakUtil';
 import { parse } from 'querystring';

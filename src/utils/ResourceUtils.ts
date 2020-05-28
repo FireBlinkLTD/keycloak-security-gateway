@@ -1,6 +1,5 @@
-import { IncomingMessage } from 'http';
 import { ITargetPathResult, IResourceDefinition } from '../interfaces';
-import { $log } from 'ts-log-debug';
+import { $log } from '@tsed/logger';
 import { get } from 'config';
 import { IClientConfiguration } from '../interfaces/IClientConfiguration';
 

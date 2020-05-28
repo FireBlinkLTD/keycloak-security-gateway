@@ -3,7 +3,7 @@ import { createProxyServer } from 'http-proxy';
 import { get } from 'config';
 import { ITargetPathResult } from './interfaces';
 import { JWT } from './models/JWT';
-import { $log } from 'ts-log-debug';
+import { $log } from '@tsed/logger';
 import * as ejs from 'ejs';
 import { sendError, sendRedirect, setAuthCookies } from './utils/ResponseUtil';
 import { extractAccessToken, extractRefreshToken, extractRequestPath } from './utils/RequestUtil';

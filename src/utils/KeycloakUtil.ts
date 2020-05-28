@@ -5,7 +5,7 @@ import axios, { AxiosInstance } from 'axios';
 import { getPublicKey } from './RSAPublicKeyUtil';
 import { parse, stringify } from 'querystring';
 import { ITokenResponse } from '../interfaces/ITokenResponse';
-import { $log } from 'ts-log-debug';
+import { $log } from '@tsed/logger';
 import { IClientConfiguration } from '../interfaces/IClientConfiguration';
 
 const host: string = get('host');

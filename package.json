@@ -31,7 +31,7 @@
     "http-proxy": "1.18.1",
     "js-yaml": "3.14.0",
     "jsonwebtoken": "8.5.1",
-    "snyk": "^1.330.3"
+    "snyk": "^1.518.0"
   },
   "devDependencies": {
     "@commitlint/cli": "8.3.5",

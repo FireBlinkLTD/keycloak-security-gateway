@@ -50,7 +50,7 @@
     "commitizen": "4.1.2",
     "conventional-changelog-cli": "2.0.34",
     "cz-conventional-changelog": "3.2.0",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "husky": "4.2.5",
     "jsonlint": "1.6.3",
     "lint-staged": "10.2.6",

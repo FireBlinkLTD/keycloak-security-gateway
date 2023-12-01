@@ -1,3 +1,7 @@
+# [DEPRECATED]
+
+This project is deprecated. Please consider using [https://github.com/FireBlinkLTD/prxi-openid-connect](https://github.com/FireBlinkLTD/prxi-openid-connect) instead.
+
 # fireblink/keycloak-security-gateway
 
 [![CircleCI](https://circleci.com/gh/FireBlinkLTD/keycloak-security-gateway.svg?style=svg)](https://circleci.com/gh/FireBlinkLTD/keycloak-security-gateway)
